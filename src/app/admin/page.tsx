@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { AdminDashboard } from "@/components/admin/admin-dashboard";
 import { ADMIN_COOKIE_NAME, isAdminConfigured, isValidAdminSessionToken } from "@/lib/server/admin-auth";
 import { getAllResults } from "@/lib/server/admin-log-store";
+import { getKvStatus } from "@/lib/server/kv-client";
 
 export const metadata: Metadata = {
   title: "Admin | MBTI-64",
@@ -35,11 +36,12 @@ export default async function AdminPage() {
   }
 
   const results = await getAllResults();
+  const kvStatus = getKvStatus();
 
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
-      <AdminDashboard results={results} />
+      <AdminDashboard results={results} kvStatus={kvStatus} />
     </div>
   );
 }

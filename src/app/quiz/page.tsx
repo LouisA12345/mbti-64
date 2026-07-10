@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Loader2, RotateCcw, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,13 @@ export default function QuizPage() {
   // and silently skips a question.
   const advanceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Guards against a repeat click on "See My Result" before navigation completes (very easy
+  // to trigger on a real network, where there's a visible beat between click and page change,
+  // unlike instant local dev) — without this, each click re-submits and adds another separately
+  // timestamped entry to history for what the user experiences as one completion.
+  const hasFinishedRef = useRef(false);
+  const [isFinishing, setIsFinishing] = useState(false);
+
   const cancelAutoAdvance = useCallback(() => {
     if (advanceTimeout.current) {
       clearTimeout(advanceTimeout.current);
@@ -75,9 +82,16 @@ export default function QuizPage() {
   }
 
   function handleFinish() {
+    if (hasFinishedRef.current) return;
+    hasFinishedRef.current = true;
+    setIsFinishing(true);
     cancelAutoAdvance();
     const result = submit();
-    if (!result) return;
+    if (!result) {
+      hasFinishedRef.current = false;
+      setIsFinishing(false);
+      return;
+    }
     const query = encodeScoresToQuery(result.scores);
     // Read directly from the URL (no useSearchParams hook) so this stays a plain client
     // event handler with no Suspense-boundary requirement for an otherwise static page.
@@ -174,9 +188,15 @@ export default function QuizPage() {
           </Button>
 
           {isLast ? (
-            <Button onClick={handleFinish} disabled={!allAnswered} size="lg" className="bg-gradient-brand text-white hover:opacity-90">
-              See My Result
-              <ArrowRight className="size-4" />
+            <Button
+              onClick={handleFinish}
+              disabled={!allAnswered || isFinishing}
+              size="lg"
+              className="bg-gradient-brand text-white hover:opacity-90"
+            >
+              {isFinishing ? <Loader2 className="size-4 animate-spin" /> : null}
+              {isFinishing ? "Preparing…" : "See My Result"}
+              {!isFinishing && <ArrowRight className="size-4" />}
             </Button>
           ) : (
             <Button variant="outline" onClick={handleNext} disabled={currentValue === undefined}>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut, ShieldCheck } from "lucide-react";
+import { LogOut, ShieldCheck, Database, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PersonalityIllustration } from "@/components/results/personality-illustration";
@@ -10,6 +10,7 @@ import { getProfile } from "@/lib/data/profiles";
 import { encodeScoresToQuery } from "@/lib/scoring";
 import type { PersonalityCode } from "@/lib/types";
 import type { GlobalResultEntry } from "@/lib/server/admin-log-store";
+import type { getKvStatus } from "@/lib/server/kv-client";
 
 function formatDate(timestamp: number): string {
   return new Date(timestamp).toLocaleString(undefined, {
@@ -23,9 +24,10 @@ function formatDate(timestamp: number): string {
 
 interface AdminDashboardProps {
   results: GlobalResultEntry[];
+  kvStatus: ReturnType<typeof getKvStatus>;
 }
 
-export function AdminDashboard({ results }: AdminDashboardProps) {
+export function AdminDashboard({ results, kvStatus }: AdminDashboardProps) {
   const router = useRouter();
 
   async function handleLogout() {
@@ -49,6 +51,19 @@ export function AdminDashboard({ results }: AdminDashboardProps) {
           Log Out
         </Button>
       </div>
+
+      {kvStatus.connected ? (
+        <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-sm text-emerald-600 dark:text-emerald-400">
+          <Database className="size-4 shrink-0" />
+          Storage: connected to Redis ({kvStatus.source === "KV_REST_API" ? "Vercel KV" : "Upstash"}) — results persist across deploys.
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-sm text-amber-600 dark:text-amber-400">
+          <AlertTriangle className="size-4 shrink-0" />
+          Storage: no KV database connected — using the local file fallback, which does not persist on Vercel&rsquo;s
+          serverless filesystem. Connect a database from the project&rsquo;s Storage tab, then redeploy.
+        </div>
+      )}
 
       <p className="text-sm text-muted-foreground">{results.length} total completed assessments</p>
 

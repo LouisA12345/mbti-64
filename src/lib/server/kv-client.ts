@@ -18,3 +18,14 @@ export function getRedisClient(): Redis | null {
   client = credentials ? new Redis(credentials) : null;
   return client;
 }
+
+/** Which env var pair (if any) is actually wired up — surfaced on the admin dashboard for diagnosis. */
+export function getKvStatus(): { connected: boolean; source: "KV_REST_API" | "UPSTASH_REDIS_REST" | null } {
+  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+    return { connected: true, source: "KV_REST_API" };
+  }
+  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+    return { connected: true, source: "UPSTASH_REDIS_REST" };
+  }
+  return { connected: false, source: null };
+}
