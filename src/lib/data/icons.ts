@@ -1,0 +1,61 @@
+import {
+  Telescope, Lightbulb, ChessKnight, BrainCircuit,
+  Cpu, Compass, Microscope, BookOpen,
+  Rocket, Hammer, TrendingUp, Crown,
+  Zap, Sparkles, Swords, Mountain,
+  Scale, Moon, Target, HeartHandshake,
+  PenTool, Feather, Palette, ShieldCheck,
+  Flame, Users, Gauge, Map,
+  PartyPopper, Bird, Sun, Handshake,
+  Wrench, Puzzle, Trophy, Anchor,
+  Heart, Backpack, House, Umbrella,
+  Settings, RefreshCw, Briefcase, ClipboardList,
+  Megaphone, DoorOpen, Medal, UtensilsCrossed,
+  Cog, Bike, Crosshair, Ruler,
+  Brush, Flower2, Gem, Scissors,
+  Dices, Waves, Timer, Eye,
+  Star, Music, Drama, Mic,
+  FlaskConical, Milestone, Landmark, Sunrise, Leaf, Footprints, Flag, LayoutGrid,
+  type LucideIcon,
+} from "lucide-react";
+import type { MBTIType, PersonalityCode } from "../types";
+
+/** One distinct icon per MBTI base type, matching its core archetype. */
+export const BASE_TYPE_ICON: Record<MBTIType, LucideIcon> = {
+  INTJ: ChessKnight,
+  INTP: FlaskConical,
+  ENTJ: Crown,
+  ENTP: Lightbulb,
+  INFJ: Moon,
+  INFP: Feather,
+  ENFJ: Flame,
+  ENFP: Sparkles,
+  ISTJ: Anchor,
+  ISFJ: ShieldCheck,
+  ESTJ: ClipboardList,
+  ESFJ: Handshake,
+  ISTP: Wrench,
+  ISFP: Palette,
+  ESTP: Rocket,
+  ESFP: Drama,
+};
+
+/** One distinct icon per full 64-type code, matching that specific combination's title/theme. */
+export const PERSONALITY_ICON: Record<PersonalityCode, LucideIcon> = {
+  "INTJ-O-C": Telescope, "INTJ-O-H": Lightbulb, "INTJ-A-C": Milestone, "INTJ-A-H": BrainCircuit,
+  "INTP-O-C": Cpu, "INTP-O-H": Compass, "INTP-A-C": Microscope, "INTP-A-H": BookOpen,
+  "ENTJ-O-C": Rocket, "ENTJ-O-H": Hammer, "ENTJ-A-C": TrendingUp, "ENTJ-A-H": Landmark,
+  "ENTP-O-C": Zap, "ENTP-O-H": Sparkles, "ENTP-A-C": Swords, "ENTP-A-H": Mountain,
+  "INFJ-O-C": Scale, "INFJ-O-H": Sunrise, "INFJ-A-C": Target, "INFJ-A-H": HeartHandshake,
+  "INFP-O-C": PenTool, "INFP-O-H": Leaf, "INFP-A-C": Palette, "INFP-A-H": ShieldCheck,
+  "ENFJ-O-C": Footprints, "ENFJ-O-H": Users, "ENFJ-A-C": Gauge, "ENFJ-A-H": Map,
+  "ENFP-O-C": PartyPopper, "ENFP-O-H": Bird, "ENFP-A-C": Sun, "ENFP-A-H": Handshake,
+  "ISTJ-O-C": Wrench, "ISTJ-O-H": Puzzle, "ISTJ-A-C": Trophy, "ISTJ-A-H": Flag,
+  "ISFJ-O-C": Heart, "ISFJ-O-H": Backpack, "ISFJ-A-C": House, "ISFJ-A-H": Umbrella,
+  "ESTJ-O-C": Settings, "ESTJ-O-H": RefreshCw, "ESTJ-A-C": Briefcase, "ESTJ-A-H": LayoutGrid,
+  "ESFJ-O-C": Megaphone, "ESFJ-O-H": DoorOpen, "ESFJ-A-C": Medal, "ESFJ-A-H": UtensilsCrossed,
+  "ISTP-O-C": Cog, "ISTP-O-H": Bike, "ISTP-A-C": Crosshair, "ISTP-A-H": Ruler,
+  "ISFP-O-C": Brush, "ISFP-O-H": Flower2, "ISFP-A-C": Gem, "ISFP-A-H": Scissors,
+  "ESTP-O-C": Dices, "ESTP-O-H": Waves, "ESTP-A-C": Timer, "ESTP-A-H": Eye,
+  "ESFP-O-C": Star, "ESFP-O-H": Music, "ESFP-A-C": Flame, "ESFP-A-H": Mic,
+};
