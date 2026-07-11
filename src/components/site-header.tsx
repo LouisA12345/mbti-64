@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { AuthNav } from "@/components/auth/auth-nav";
+import { MobileNav } from "@/components/mobile-nav";
 
 export function SiteHeader() {
   return (
@@ -34,6 +35,7 @@ export function SiteHeader() {
           </Link>
           <AuthNav />
           <ThemeToggle />
+          <MobileNav />
         </nav>
       </div>
     </header>

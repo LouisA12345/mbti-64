@@ -5,7 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { User, LogOut } from "lucide-react";
 
-export function AuthNav() {
+interface AuthNavProps {
+  /** "desktop" (default) hides itself below the sm breakpoint, for the horizontal header nav.
+   * "mobile" is always visible with full-width stacked styling, for use inside the mobile sheet. */
+  variant?: "desktop" | "mobile";
+  onNavigate?: () => void;
+}
+
+export function AuthNav({ variant = "desktop", onNavigate }: AuthNavProps) {
   const router = useRouter();
   // undefined = still checking, null = logged out, string = logged in as this username.
   const [username, setUsername] = useState<string | null | undefined>(undefined);
@@ -23,29 +30,61 @@ export function AuthNav() {
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
     setUsername(null);
+    onNavigate?.();
     router.push("/");
     router.refresh();
   }
 
   if (username === undefined) {
-    return <span className="hidden size-8 sm:inline-block" />;
+    return variant === "mobile" ? null : <span className="hidden size-8 sm:inline-block" />;
   }
+
+  if (variant === "mobile") {
+    const linkClass =
+      "flex items-center gap-2 rounded-md px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground";
+    return (
+      <div className="flex flex-col gap-1">
+        {username ? (
+          <>
+            <Link href="/profile" onClick={onNavigate} className={linkClass}>
+              <User className="size-3.5" />
+              {username}
+            </Link>
+            <button type="button" onClick={handleLogout} className={linkClass}>
+              <LogOut className="size-3.5" />
+              Log Out
+            </button>
+          </>
+        ) : (
+          <>
+            <Link href="/login" onClick={onNavigate} className={linkClass}>
+              Log In
+            </Link>
+            <Link
+              href="/signup"
+              onClick={onNavigate}
+              className="rounded-md bg-gradient-brand px-3 py-2.5 text-center text-sm font-medium text-white transition-opacity hover:opacity-90"
+            >
+              Sign Up
+            </Link>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  // Desktop: direct flex-item children of the header's <nav>, each hidden below sm.
+  const desktopLinkClass =
+    "hidden items-center gap-1.5 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:inline-flex";
 
   if (username) {
     return (
       <>
-        <Link
-          href="/profile"
-          className="hidden items-center gap-1.5 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
-        >
+        <Link href="/profile" className={desktopLinkClass}>
           <User className="size-3.5" />
           {username}
         </Link>
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="hidden items-center gap-1.5 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
-        >
+        <button type="button" onClick={handleLogout} className={desktopLinkClass}>
           <LogOut className="size-3.5" />
           Log Out
         </button>

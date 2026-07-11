@@ -188,7 +188,7 @@ export default function Home() {
       </main>
       <footer className="border-t border-border/60 py-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-2 px-4 text-center text-sm text-muted-foreground sm:px-6">
-          <span>MBTI-64 — an original 64-type personality framework. Not affiliated with the Myers-Briggs Company.</span>
+          <span>MBTI-64 is an original 64-type personality framework, built by Louis as a personal hobby project.</span>
         </div>
       </footer>
     </div>
