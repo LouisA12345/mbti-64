@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { logResultGlobally } from "@/lib/server/admin-log-store";
+import { getCurrentUsername } from "@/lib/server/user-auth";
+import { saveUserResult } from "@/lib/server/user-results-store";
 import { ALL_PERSONALITY_CODES } from "@/lib/data/profiles";
 import { AXES } from "@/lib/types";
 
@@ -22,6 +24,10 @@ const postSchema = z.object({
  * Logs every completed assessment (not just ones shared to a friend) so the admin dashboard
  * has full visibility. Called best-effort from the quiz's finish handler — failures here
  * never block a visitor from seeing their own result.
+ *
+ * If the visitor is logged in, the result is attributed to their real account (verified) and
+ * also saved to their personal, cross-device account history — independent of the anonymous
+ * localStorage/ownerId history that keeps working the same for logged-out visitors.
  */
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
@@ -31,14 +37,21 @@ export async function POST(request: Request) {
   }
 
   const { ownerId, name, code, scores } = parsed.data;
+  const username = await getCurrentUsername().catch(() => null);
+  const completedAt = Date.now();
+
   try {
     await logResultGlobally({
       ownerId,
-      name: name && name.length > 0 ? name : "Anonymous",
+      name: username ?? (name && name.length > 0 ? name : "Anonymous"),
+      verified: Boolean(username),
       code,
       scores,
-      completedAt: Date.now(),
+      completedAt,
     });
+    if (username) {
+      await saveUserResult(username, { code, scores, completedAt });
+    }
   } catch {
     // Most likely cause on a fresh serverless deploy: no KV database connected yet. This
     // logging call is already best-effort/fire-and-forget from the client, so just fail

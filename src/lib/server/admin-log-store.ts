@@ -6,6 +6,8 @@ import type { DimensionScores } from "../types";
 export interface GlobalResultEntry {
   ownerId: string;
   name: string;
+  /** True when `name` is a real, logged-in account username rather than a self-typed or anonymous label. */
+  verified: boolean;
   code: string;
   scores: DimensionScores;
   completedAt: number;

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { AuthNav } from "@/components/auth/auth-nav";
 
 export function SiteHeader() {
   return (
@@ -31,6 +32,7 @@ export function SiteHeader() {
           >
             History
           </Link>
+          <AuthNav />
           <ThemeToggle />
         </nav>
       </div>
