@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { UserPlus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { getSafeNextPath } from "@/lib/safe-redirect";
 
 export function SignupForm() {
   const router = useRouter();
@@ -15,6 +16,18 @@ export function SignupForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loginHref, setLoginHref] = useState("/login");
+
+  // Preserve `?next=` across to the login link too, so switching forms doesn't lose the
+  // "come back here after auth" destination (e.g. from the /quiz login gate). Reading it via
+  // an effect (rather than during render) keeps the first render identical on server and
+  // client, since `window` doesn't exist during SSR.
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    const next = new URLSearchParams(window.location.search).get("next");
+    if (next) setLoginHref(`/login?next=${encodeURIComponent(next)}`);
+  }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -37,7 +50,8 @@ export function SignupForm() {
         setError(data.error ?? "Something went wrong.");
         return;
       }
-      router.push("/profile");
+      const next = getSafeNextPath(new URLSearchParams(window.location.search).get("next"));
+      router.push(next);
       router.refresh();
     } catch {
       setError("Something went wrong. Please try again.");
@@ -81,7 +95,7 @@ export function SignupForm() {
           </Button>
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link href="/login" className="font-medium text-brand underline underline-offset-4">
+            <Link href={loginHref} className="font-medium text-brand underline underline-offset-4">
               Log in
             </Link>
           </p>

@@ -31,7 +31,7 @@ export default async function AdminPage() {
 
   const cookieStore = await cookies();
   const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
-  if (!isValidAdminSessionToken(token)) {
+  if (!(await isValidAdminSessionToken(token))) {
     redirect("/admin/login");
   }
 

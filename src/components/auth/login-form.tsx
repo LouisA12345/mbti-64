@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LogIn } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { getSafeNextPath } from "@/lib/safe-redirect";
 
 export function LoginForm() {
   const router = useRouter();
@@ -14,6 +15,18 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [signupHref, setSignupHref] = useState("/signup");
+
+  // Preserve `?next=` across to the signup link too, so switching forms doesn't lose the
+  // "come back here after auth" destination (e.g. from the /quiz login gate). Reading it via
+  // an effect (rather than during render) keeps the first render identical on server and
+  // client, since `window` doesn't exist during SSR.
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    const next = new URLSearchParams(window.location.search).get("next");
+    if (next) setSignupHref(`/signup?next=${encodeURIComponent(next)}`);
+  }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,7 +43,8 @@ export function LoginForm() {
         setError(data.error ?? "Something went wrong.");
         return;
       }
-      router.push("/profile");
+      const next = getSafeNextPath(new URLSearchParams(window.location.search).get("next"));
+      router.push(next);
       router.refresh();
     } catch {
       setError("Something went wrong. Please try again.");
@@ -57,7 +71,7 @@ export function LoginForm() {
           </Button>
           <p className="text-center text-sm text-muted-foreground">
             Don&rsquo;t have an account?{" "}
-            <Link href="/signup" className="font-medium text-brand underline underline-offset-4">
+            <Link href={signupHref} className="font-medium text-brand underline underline-offset-4">
               Sign up
             </Link>
           </p>

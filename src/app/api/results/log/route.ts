@@ -13,8 +13,14 @@ const scoresSchema = z.object(
   >,
 );
 
+// Client-generated via crypto.randomUUID(); restricting the charset (rather than just length)
+// keeps it from being used to smuggle anything unexpected into the underlying storage key.
 const postSchema = z.object({
-  ownerId: z.string().min(1).max(100),
+  ownerId: z
+    .string()
+    .min(1)
+    .max(100)
+    .regex(/^[a-zA-Z0-9-]+$/, "Invalid id"),
   name: z.string().trim().max(40).optional(),
   code: z.string().refine((c) => (ALL_PERSONALITY_CODES as string[]).includes(c), "Invalid personality code"),
   scores: scoresSchema,

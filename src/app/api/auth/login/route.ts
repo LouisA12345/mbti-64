@@ -3,6 +3,7 @@ import { z } from "zod";
 import { verifyUserCredentials } from "@/lib/server/user-store";
 import { createSession } from "@/lib/server/session-store";
 import { SESSION_COOKIE_NAME, sessionCookieOptions } from "@/lib/server/user-auth";
+import { consumeRateLimit, getClientIp } from "@/lib/server/rate-limit";
 
 const loginSchema = z.object({
   username: z.string().trim().min(1).max(20),
@@ -10,6 +11,14 @@ const loginSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  const rateLimit = await consumeRateLimit(`login:${getClientIp(request)}`, 10);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many attempts. Please try again later." },
+      { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } },
+    );
+  }
+
   const body = await request.json().catch(() => null);
   const parsed = loginSchema.safeParse(body);
   if (!parsed.success) {

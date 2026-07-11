@@ -11,19 +11,28 @@ const scoresSchema = z.object(
   >,
 );
 
+// Client-generated via crypto.randomUUID(); restricting the charset (rather than just length)
+// keeps it from being used to smuggle anything unexpected into the underlying storage key.
+const ownerIdSchema = z
+  .string()
+  .min(1)
+  .max(100)
+  .regex(/^[a-zA-Z0-9-]+$/, "Invalid id");
+
 const postSchema = z.object({
-  ownerId: z.string().min(1).max(100),
+  ownerId: ownerIdSchema,
   name: z.string().trim().min(1).max(40),
   code: z.string().refine((c) => (ALL_PERSONALITY_CODES as string[]).includes(c), "Invalid personality code"),
   scores: scoresSchema,
 });
 
 export async function GET(request: Request) {
-  const ownerId = new URL(request.url).searchParams.get("ownerId");
-  if (!ownerId) {
-    return NextResponse.json({ error: "Missing ownerId" }, { status: 400 });
+  const raw = new URL(request.url).searchParams.get("ownerId");
+  const parsed = ownerIdSchema.safeParse(raw);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Missing or invalid ownerId" }, { status: 400 });
   }
-  const results = await getSharedResults(ownerId);
+  const results = await getSharedResults(parsed.data);
   return NextResponse.json({ results });
 }
 
