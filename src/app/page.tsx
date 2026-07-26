@@ -177,7 +177,7 @@ export default function Home() {
         {/* CTA */}
         <section className="mx-auto max-w-4xl px-4 pb-24 sm:px-6">
           <div className="flex flex-col items-center gap-6 rounded-3xl bg-gradient-brand p-10 text-center text-white sm:p-16">
-            <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">Ready to find your code?</h2>
+            <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">Ready to find your personality type?</h2>
             <p className="max-w-xl text-white/85">About seven minutes. No sign-up. Your progress autosaves as you go.</p>
             <Button size="lg" variant="secondary" className="text-foreground" nativeButton={false} render={<Link href="/quiz" />}>
               Start the Assessment

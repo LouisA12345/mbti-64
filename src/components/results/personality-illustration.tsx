@@ -61,11 +61,11 @@ export function PersonalityIllustration({ profile, className, id, compact = fals
           </span>
         </div>
       ) : (
-        <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-gradient-to-t from-black/50 to-transparent p-4">
-          <span className="rounded-full bg-white/15 px-3 py-1 font-mono text-xs font-semibold text-white backdrop-blur-sm">
+        <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1.5 bg-gradient-to-t from-black/50 to-transparent p-2.5 sm:gap-2 sm:p-4">
+          <span className="shrink-0 rounded-full bg-white/15 px-2 py-0.5 font-mono text-[10px] font-semibold text-white backdrop-blur-sm sm:px-3 sm:py-1 sm:text-xs">
             {profile.code}
           </span>
-          <span className="truncate rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
+          <span className="min-w-0 truncate rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm sm:px-3 sm:py-1 sm:text-xs">
             {profile.spiritAnimal}
           </span>
         </div>
