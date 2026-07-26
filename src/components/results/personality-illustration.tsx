@@ -6,8 +6,9 @@ interface PersonalityIllustrationProps {
   profile: PersonalityProfile;
   className?: string;
   id?: string;
-  /** Use in small contexts (grid thumbnails, history/admin rows) — drops the spirit-animal
-   * label and shrinks the overlay text, which otherwise gets badly truncated below ~200px. */
+  /** Use in small contexts (grid thumbnails, history/admin rows) — shows just the spirit-animal
+   * name (dropping the code badge) and shrinks the overlay text, which otherwise gets badly
+   * truncated below ~200px. */
   compact?: boolean;
 }
 
@@ -56,8 +57,8 @@ export function PersonalityIllustration({ profile, className, id, compact = fals
       </div>
       {compact ? (
         <div className="absolute inset-x-0 bottom-0 flex justify-center bg-gradient-to-t from-black/50 to-transparent p-2">
-          <span className="truncate rounded-full bg-white/15 px-2 py-0.5 font-mono text-[10px] font-semibold text-white backdrop-blur-sm">
-            {profile.code}
+          <span className="min-w-0 max-w-full truncate rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
+            {profile.spiritAnimal}
           </span>
         </div>
       ) : (
