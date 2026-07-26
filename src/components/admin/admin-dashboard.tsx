@@ -102,7 +102,7 @@ export function AdminDashboard({ results, kvStatus }: AdminDashboardProps) {
                 className="flex gap-4 rounded-2xl border border-border/60 bg-card p-4"
               >
                 <Link href={`/results/${profile.code}?${query.toString()}`} className="shrink-0">
-                  <PersonalityIllustration profile={profile} className="size-20 rounded-xl" />
+                  <PersonalityIllustration profile={profile} className="size-20 rounded-xl" compact />
                 </Link>
                 <div className="flex min-w-0 flex-col justify-center gap-1.5">
                   <div className="flex flex-wrap items-center gap-1.5">

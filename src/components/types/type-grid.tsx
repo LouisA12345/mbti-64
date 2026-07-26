@@ -69,7 +69,7 @@ export function TypeGrid({ profiles }: TypeGridProps) {
             href={`/results/${profile.code}`}
             className="group flex flex-col gap-3 rounded-2xl border border-border/60 bg-card p-3 transition-all hover:-translate-y-1 hover:border-brand/50 hover:shadow-lg"
           >
-            <PersonalityIllustration profile={profile} className="rounded-xl" />
+            <PersonalityIllustration profile={profile} className="rounded-xl" compact />
             <div className="flex flex-col gap-1 px-1 pb-1">
               <Badge variant="outline" className="w-fit font-mono text-[10px]">
                 {profile.code}

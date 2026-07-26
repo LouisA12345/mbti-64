@@ -94,7 +94,7 @@ export function ProfileView({ username, results: initialResults }: ProfileViewPr
               return (
                 <div key={entry.completedAt} className="flex gap-4 rounded-2xl border border-border/60 bg-card p-4">
                   <Link href={`/results/${profile.code}?${query.toString()}`} className="shrink-0">
-                    <PersonalityIllustration profile={profile} className="size-20 rounded-xl" />
+                    <PersonalityIllustration profile={profile} className="size-20 rounded-xl" compact />
                   </Link>
                   <div className="flex min-w-0 flex-col justify-center gap-1.5">
                     <Badge variant="outline" className="w-fit font-mono text-[10px]">

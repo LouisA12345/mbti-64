@@ -6,9 +6,12 @@ interface PersonalityIllustrationProps {
   profile: PersonalityProfile;
   className?: string;
   id?: string;
+  /** Use in small contexts (grid thumbnails, history/admin rows) — drops the spirit-animal
+   * label and shrinks the overlay text, which otherwise gets badly truncated below ~200px. */
+  compact?: boolean;
 }
 
-export function PersonalityIllustration({ profile, className, id }: PersonalityIllustrationProps) {
+export function PersonalityIllustration({ profile, className, id, compact = false }: PersonalityIllustrationProps) {
   const { primary, secondary, accent, background } = profile.colorPalette;
   const TypeIcon = PERSONALITY_ICON[profile.code];
   const BaseIcon = BASE_TYPE_ICON[profile.mbti];
@@ -46,19 +49,27 @@ export function PersonalityIllustration({ profile, className, id }: PersonalityI
         </div>
       </div>
       <div
-        className="absolute right-3 top-3 flex size-9 items-center justify-center rounded-full bg-white/15 shadow ring-1 ring-white/25 backdrop-blur-sm"
+        className="absolute right-[6%] top-[6%] flex aspect-square w-[20%] min-w-4 items-center justify-center rounded-full bg-white/15 shadow ring-1 ring-white/25 backdrop-blur-sm"
         title={`Base type: ${profile.mbti}`}
       >
-        <BaseIcon className="size-4 text-white" strokeWidth={2} />
+        <BaseIcon className="size-1/2 text-white" strokeWidth={2} />
       </div>
-      <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-gradient-to-t from-black/50 to-transparent p-4">
-        <span className="rounded-full bg-white/15 px-3 py-1 font-mono text-xs font-semibold text-white backdrop-blur-sm">
-          {profile.code}
-        </span>
-        <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
-          {profile.spiritAnimal}
-        </span>
-      </div>
+      {compact ? (
+        <div className="absolute inset-x-0 bottom-0 flex justify-center bg-gradient-to-t from-black/50 to-transparent p-2">
+          <span className="truncate rounded-full bg-white/15 px-2 py-0.5 font-mono text-[10px] font-semibold text-white backdrop-blur-sm">
+            {profile.code}
+          </span>
+        </div>
+      ) : (
+        <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-gradient-to-t from-black/50 to-transparent p-4">
+          <span className="rounded-full bg-white/15 px-3 py-1 font-mono text-xs font-semibold text-white backdrop-blur-sm">
+            {profile.code}
+          </span>
+          <span className="truncate rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
+            {profile.spiritAnimal}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
