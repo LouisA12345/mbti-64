@@ -1,7 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { AXES, AXIS_LABELS, type DimensionScores } from "@/lib/types";
+import { AXES, type DimensionScores } from "@/lib/types";
+import { AXIS_LABEL_KEYS } from "@/lib/i18n/dictionary";
+import { useT } from "@/lib/i18n/use-translations";
 
 interface DimensionBarsProps {
   scores: DimensionScores;
@@ -9,22 +11,23 @@ interface DimensionBarsProps {
 }
 
 export function DimensionBars({ scores, primaryColor = "var(--brand)" }: DimensionBarsProps) {
+  const t = useT();
   return (
     <div className="flex flex-col gap-5">
       {AXES.map((axis, i) => {
-        const label = AXIS_LABELS[axis];
+        const label = AXIS_LABEL_KEYS[axis];
         const value = scores[axis];
         return (
           <div key={axis}>
             <div className="mb-1.5 flex items-center justify-between text-sm">
               <span className={value >= 50 ? "font-semibold text-foreground" : "text-muted-foreground"}>
-                {label.positive}
+                {t(label.positive)}
               </span>
               <span className="font-mono text-xs text-muted-foreground">
                 {value}% / {100 - value}%
               </span>
               <span className={value < 50 ? "font-semibold text-foreground" : "text-muted-foreground"}>
-                {label.negative}
+                {t(label.negative)}
               </span>
             </div>
             <div className="relative h-3 w-full overflow-hidden rounded-full bg-muted">

@@ -37,7 +37,6 @@ export default async function ResultPage({ params, searchParams }: PageProps) {
   const { code } = await params;
   if (!isValidCode(code)) notFound();
 
-  const profile = getProfile(code);
   const sp = await searchParams;
   const decoded = decodeScoresFromQuery(sp);
   const scores = decoded ?? defaultScoresForCode(code);
@@ -46,7 +45,7 @@ export default async function ResultPage({ params, searchParams }: PageProps) {
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
-      <ResultView profile={profile} scores={scores} isPersonal={decoded !== null} forOwnerId={forOwnerId} />
+      <ResultView code={code} scores={scores} isPersonal={decoded !== null} forOwnerId={forOwnerId} />
     </div>
   );
 }

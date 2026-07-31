@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { PersonalityIllustration } from "@/components/results/personality-illustration";
 import { getProfile } from "@/lib/data/profiles";
 import { encodeScoresToQuery } from "@/lib/scoring";
+import { useT } from "@/lib/i18n/use-translations";
+import { useLocale } from "@/components/locale-provider";
 import type { PersonalityCode } from "@/lib/types";
 import type { UserResultEntry } from "@/lib/server/user-results-store";
 
@@ -29,10 +31,12 @@ interface ProfileViewProps {
 
 export function ProfileView({ username, results: initialResults }: ProfileViewProps) {
   const router = useRouter();
+  const t = useT();
+  const { locale } = useLocale();
   const [results, setResults] = useState(initialResults);
 
   async function handleClear() {
-    if (!window.confirm("Clear all of your saved results? This can't be undone.")) return;
+    if (!window.confirm(t("profile.clearConfirm"))) return;
     await fetch("/api/profile/clear", { method: "POST" });
     setResults([]);
   }
@@ -51,45 +55,42 @@ export function ProfileView({ username, results: initialResults }: ProfileViewPr
             <User className="size-7 text-brand" />
             {username}
           </h1>
-          <p className="text-muted-foreground">
-            Results saved here follow your account across any device you log in on — separate from the local, this-device-only
-            history.
-          </p>
+          <p className="text-muted-foreground">{t("profile.description")}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" render={<Link href="/history" />} nativeButton={false}>
             <History className="size-4" />
-            Local History
+            {t("profile.localHistory")}
           </Button>
           <Button variant="outline" onClick={handleLogout}>
-            Log Out
+            {t("nav.logOut")}
           </Button>
         </div>
       </div>
 
       {results.length === 0 ? (
         <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border py-16 text-center">
-          <p className="font-medium">No results on your account yet</p>
-          <p className="text-sm text-muted-foreground">Take the assessment while logged in and it&rsquo;ll show up here.</p>
+          <p className="font-medium">{t("profile.emptyTitle")}</p>
+          <p className="text-sm text-muted-foreground">{t("profile.emptyDescription")}</p>
           <Button render={<Link href="/quiz" />} nativeButton={false}>
-            Take the Assessment
+            {t("history.takeAssessment")}
           </Button>
         </div>
       ) : (
         <>
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              {results.length} saved result{results.length === 1 ? "" : "s"}, most recent first
+              {t("history.savedCount", { count: results.length, s: results.length === 1 ? "" : "s" })}
             </p>
             <Button variant="ghost" size="sm" onClick={handleClear}>
               <Trash2 className="size-3.5" />
-              Clear My Results
+              {t("history.clearMine")}
             </Button>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {results.map((entry) => {
-              const profile = getProfile(entry.code as PersonalityCode);
+              const profile = getProfile(entry.code as PersonalityCode, locale);
               const query = encodeScoresToQuery(entry.scores);
               return (
                 <div key={entry.completedAt} className="flex gap-4 rounded-2xl border border-border/60 bg-card p-4">
@@ -113,7 +114,7 @@ export function ProfileView({ username, results: initialResults }: ProfileViewPr
           <div className="flex justify-center pt-4">
             <Button variant="outline" render={<Link href="/quiz" />} nativeButton={false}>
               <RefreshCw className="size-4" />
-              Take It Again
+              {t("history.takeItAgain")}
             </Button>
           </div>
         </>

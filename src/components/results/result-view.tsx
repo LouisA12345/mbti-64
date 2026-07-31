@@ -11,16 +11,23 @@ import { RadarChartCard } from "@/components/results/radar-chart-card";
 import { ShareBar } from "@/components/results/share-bar";
 import { ProfileSections } from "@/components/results/profile-sections";
 import { SharedHistoryPrompt } from "@/components/results/shared-history-prompt";
-import type { DimensionScores, PersonalityProfile } from "@/lib/types";
+import { useT } from "@/lib/i18n/use-translations";
+import { useLocale } from "@/components/locale-provider";
+import { RARITY_LABEL_KEYS } from "@/lib/i18n/dictionary";
+import { getProfile } from "@/lib/data/profiles";
+import type { DimensionScores, PersonalityCode } from "@/lib/types";
 
 interface ResultViewProps {
-  profile: PersonalityProfile;
+  code: PersonalityCode;
   scores: DimensionScores;
   isPersonal: boolean;
   forOwnerId?: string;
 }
 
-export function ResultView({ profile, scores, isPersonal, forOwnerId }: ResultViewProps) {
+export function ResultView({ code, scores, isPersonal, forOwnerId }: ResultViewProps) {
+  const t = useT();
+  const { locale } = useLocale();
+  const profile = getProfile(code, locale);
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 py-10 sm:px-6 sm:py-14">
       {isPersonal && forOwnerId && (
@@ -29,12 +36,12 @@ export function ResultView({ profile, scores, isPersonal, forOwnerId }: ResultVi
 
       {!isPersonal && (
         <div className="rounded-xl border border-brand/30 bg-brand/5 px-4 py-3 text-sm text-muted-foreground">
-          You&rsquo;re viewing the <span className="font-medium text-foreground">{profile.code}</span> archetype overview with
-          representative scores.{" "}
+          {t("results.viewingArchetype1")} <span className="font-medium text-foreground">{profile.code}</span>{" "}
+          {t("results.viewingArchetype2")}{" "}
           <Link href="/quiz" className="font-medium text-brand underline underline-offset-4">
-            Take the assessment
+            {t("results.takeAssessment")}
           </Link>{" "}
-          to get your personal result.
+          {t("results.toGetPersonal")}
         </div>
       )}
 
@@ -42,22 +49,22 @@ export function ResultView({ profile, scores, isPersonal, forOwnerId }: ResultVi
         <PersonalityIllustration profile={profile} />
         <div className="flex flex-col justify-center gap-4">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge className="bg-gradient-brand text-white">{isPersonal ? "Your Result" : "Archetype"}</Badge>
+            <Badge className="bg-gradient-brand text-white">{isPersonal ? t("results.yourResult") : t("results.archetype")}</Badge>
             <Badge variant="outline" className="font-mono">
               {profile.code}
             </Badge>
             <Badge variant="outline" className="gap-1 border-brand/40 text-brand">
               <Gem className="size-3" />
-              {profile.rarity.label}
+              {t(RARITY_LABEL_KEYS[profile.rarity.label])}
             </Badge>
           </div>
           <h1 className="text-balance font-heading text-3xl font-semibold tracking-tight sm:text-4xl">{profile.title}</h1>
           <p className="text-pretty text-muted-foreground">{profile.tagline}</p>
           <blockquote className="border-l-2 border-brand pl-4 italic text-foreground/90">&ldquo;{profile.quote}&rdquo;</blockquote>
           <p className="text-sm text-muted-foreground">
-            Approximately <span className="font-medium text-foreground">{profile.rarity.percent}%</span> of people share this
-            exact type — ranked <span className="font-medium text-foreground">#{profile.rarity.rank}</span> rarest of all{" "}
-            {profile.rarity.totalTypes} types.
+            {t("results.rarityStat1")} <span className="font-medium text-foreground">{profile.rarity.percent}%</span>{" "}
+            {t("results.rarityStat2")} <span className="font-medium text-foreground">#{profile.rarity.rank}</span>{" "}
+            {t("results.rarityStat3")} {profile.rarity.totalTypes} {t("results.rarityStat4")}
           </p>
           <div className="mt-2">
             <DimensionBars scores={scores} primaryColor={profile.colorPalette.primary} />
@@ -69,7 +76,7 @@ export function ResultView({ profile, scores, isPersonal, forOwnerId }: ResultVi
 
       <Card>
         <CardHeader>
-          <CardTitle className="font-heading text-xl">Dimension Radar</CardTitle>
+          <CardTitle className="font-heading text-xl">{t("results.dimensionRadar")}</CardTitle>
         </CardHeader>
         <CardContent>
           <RadarChartCard scores={scores} color={profile.colorPalette.primary} />
@@ -78,7 +85,7 @@ export function ResultView({ profile, scores, isPersonal, forOwnerId }: ResultVi
 
       <Card>
         <CardHeader>
-          <CardTitle className="font-heading text-xl">The Full Picture</CardTitle>
+          <CardTitle className="font-heading text-xl">{t("results.fullPicture")}</CardTitle>
         </CardHeader>
         <CardContent>
           <ProfileSections profile={profile} />
@@ -86,19 +93,19 @@ export function ResultView({ profile, scores, isPersonal, forOwnerId }: ResultVi
       </Card>
 
       <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border py-10 text-center">
-        <p className="text-muted-foreground">Curious how you compare, or want to see a different type?</p>
+        <p className="text-muted-foreground">{t("results.compareCurious")}</p>
         <div className="flex flex-wrap justify-center gap-3">
           <Button variant="outline" nativeButton={false} render={<Link href="/quiz" />}>
             <RefreshCw className="size-4" />
-            Retake the Assessment
+            {t("results.retakeAssessment")}
           </Button>
           <Button variant="outline" nativeButton={false} render={<Link href="/types" />}>
             <LayoutGrid className="size-4" />
-            Explore All 64 Types
+            {t("results.exploreAll")}
           </Button>
           <Button variant="outline" nativeButton={false} render={<Link href="/history" />}>
             <History className="size-4" />
-            View History
+            {t("results.viewHistory")}
           </Button>
         </div>
       </div>

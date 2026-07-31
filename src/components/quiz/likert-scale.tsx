@@ -1,9 +1,18 @@
 "use client";
 
-import { LIKERT_LABELS, type LikertValue } from "@/lib/types";
+import type { LikertValue } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n/use-translations";
+import type { DictKey } from "@/lib/i18n/dictionary";
 
 const VALUES: LikertValue[] = [1, 2, 3, 4, 5];
+const LIKERT_KEYS: Record<LikertValue, DictKey> = {
+  1: "quiz.likert.1",
+  2: "quiz.likert.2",
+  3: "quiz.likert.3",
+  4: "quiz.likert.4",
+  5: "quiz.likert.5",
+};
 
 interface LikertScaleProps {
   value: LikertValue | undefined;
@@ -11,6 +20,7 @@ interface LikertScaleProps {
 }
 
 export function LikertScale({ value, onChange }: LikertScaleProps) {
+  const t = useT();
   return (
     <div role="radiogroup" aria-label="Response scale" className="grid grid-cols-5 gap-2 sm:gap-3">
       {VALUES.map((v) => {
@@ -37,7 +47,7 @@ export function LikertScale({ value, onChange }: LikertScaleProps) {
               {v}
             </span>
             <span className={cn("text-[11px] leading-tight sm:text-xs", selected ? "font-medium text-foreground" : "text-muted-foreground")}>
-              {LIKERT_LABELS[v]}
+              {t(LIKERT_KEYS[v])}
             </span>
           </button>
         );

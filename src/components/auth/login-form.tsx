@@ -8,9 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { getSafeNextPath } from "@/lib/safe-redirect";
+import { useT } from "@/lib/i18n/use-translations";
 
 export function LoginForm() {
   const router = useRouter();
+  const t = useT();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -40,14 +42,14 @@ export function LoginForm() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data.error ?? "Something went wrong.");
+        setError(data.error ?? t("auth.somethingWrong"));
         return;
       }
       const next = getSafeNextPath(new URLSearchParams(window.location.search).get("next"));
       router.push(next);
       router.refresh();
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError(t("auth.somethingWrongRetry"));
     } finally {
       setLoading(false);
     }
@@ -58,21 +60,21 @@ export function LoginForm() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 font-heading text-xl">
           <LogIn className="size-5 text-brand" />
-          Log In
+          {t("auth.loginTitle")}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <Input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" autoFocus />
-          <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
+          <Input value={username} onChange={(e) => setUsername(e.target.value)} placeholder={t("auth.usernamePlaceholder")} autoFocus />
+          <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t("auth.passwordPlaceholder")} />
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" disabled={!username || !password || loading}>
-            {loading ? "Checking…" : "Log In"}
+            {loading ? t("auth.loggingIn") : t("auth.submitLogin")}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            Don&rsquo;t have an account?{" "}
+            {t("auth.noAccount")}{" "}
             <Link href={signupHref} className="font-medium text-brand underline underline-offset-4">
-              Sign up
+              {t("auth.signUpLink")}
             </Link>
           </p>
         </form>

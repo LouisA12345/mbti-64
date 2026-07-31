@@ -10,11 +10,13 @@ import { QuestionCard } from "@/components/quiz/question-card";
 import { useQuizSession } from "@/hooks/use-quiz-session";
 import { encodeScoresToQuery } from "@/lib/scoring";
 import { getOrCreateOwnerId } from "@/lib/storage";
+import { useT } from "@/lib/i18n/use-translations";
 
 const AUTO_ADVANCE_DELAY_MS = 220;
 
 export function QuizClient() {
   const router = useRouter();
+  const t = useT();
   const {
     questions,
     currentIndex,
@@ -113,7 +115,7 @@ export function QuizClient() {
   }
 
   function handleRestart() {
-    if (window.confirm("Start over? This clears your current progress.")) {
+    if (window.confirm(t("quiz.startOverConfirm"))) {
       cancelAutoAdvance();
       restart();
     }
@@ -141,19 +143,17 @@ export function QuizClient() {
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span className="flex items-center gap-1.5">
-              <Save className="size-3.5" /> Autosaved
+              <Save className="size-3.5" /> {t("quiz.autosaved")}
             </span>
             <div className="flex items-center gap-3">
-              <span>
-                {answeredCount} / {totalCount} answered · {progressPercent}%
-              </span>
+              <span>{t("quiz.answeredCount", { answered: answeredCount, total: totalCount, percent: progressPercent })}</span>
               <button
                 type="button"
                 onClick={handleRestart}
                 className="flex items-center gap-1 text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
               >
                 <RotateCcw className="size-3" />
-                Start Over
+                {t("quiz.startOver")}
               </button>
             </div>
           </div>
@@ -170,12 +170,10 @@ export function QuizClient() {
 
         {isLast && !allAnswered && (
           <div className="flex flex-col items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-center text-sm text-amber-600 dark:text-amber-400">
-            <span>
-              You still have {totalCount - answeredCount} unanswered question{totalCount - answeredCount === 1 ? "" : "s"}.
-            </span>
+            <span>{t("quiz.unanswered", { count: totalCount - answeredCount, s: totalCount - answeredCount === 1 ? "" : "s" })}</span>
             {firstUnansweredIndex >= 0 && (
               <Button size="sm" variant="outline" onClick={() => handleJumpTo(firstUnansweredIndex)}>
-                Go to Question {firstUnansweredIndex + 1}
+                {t("quiz.goToQuestion", { number: firstUnansweredIndex + 1 })}
               </Button>
             )}
           </div>
@@ -184,7 +182,7 @@ export function QuizClient() {
         <div className="flex items-center justify-between gap-3">
           <Button variant="ghost" onClick={handlePrev} disabled={isFirst}>
             <ArrowLeft className="size-4" />
-            Back
+            {t("quiz.back")}
           </Button>
 
           {isLast ? (
@@ -195,12 +193,12 @@ export function QuizClient() {
               className="bg-gradient-brand text-white hover:opacity-90"
             >
               {isFinishing ? <Loader2 className="size-4 animate-spin" /> : null}
-              {isFinishing ? "Preparing…" : "See My Result"}
+              {isFinishing ? t("quiz.preparing") : t("quiz.seeResult")}
               {!isFinishing && <ArrowRight className="size-4" />}
             </Button>
           ) : (
             <Button variant="outline" onClick={handleNext} disabled={currentValue === undefined}>
-              Next
+              {t("quiz.next")}
               <ArrowRight className="size-4" />
             </Button>
           )}

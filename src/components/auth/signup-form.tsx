@@ -8,9 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { getSafeNextPath } from "@/lib/safe-redirect";
+import { useT } from "@/lib/i18n/use-translations";
 
 export function SignupForm() {
   const router = useRouter();
+  const t = useT();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -34,7 +36,7 @@ export function SignupForm() {
     setError("");
 
     if (password !== confirmPassword) {
-      setError("Passwords don't match.");
+      setError(t("auth.passwordsDontMatch"));
       return;
     }
 
@@ -47,14 +49,14 @@ export function SignupForm() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data.error ?? "Something went wrong.");
+        setError(data.error ?? t("auth.somethingWrong"));
         return;
       }
       const next = getSafeNextPath(new URLSearchParams(window.location.search).get("next"));
       router.push(next);
       router.refresh();
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError(t("auth.somethingWrongRetry"));
     } finally {
       setLoading(false);
     }
@@ -65,7 +67,7 @@ export function SignupForm() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 font-heading text-xl">
           <UserPlus className="size-5 text-brand" />
-          Create Your Account
+          {t("auth.signupTitle")}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -73,7 +75,7 @@ export function SignupForm() {
           <Input
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="Username"
+            placeholder={t("auth.usernamePlaceholder")}
             autoFocus
             maxLength={20}
           />
@@ -81,22 +83,22 @@ export function SignupForm() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password (min. 8 characters)"
+            placeholder={t("auth.passwordMinPlaceholder")}
           />
           <Input
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Confirm password"
+            placeholder={t("auth.confirmPasswordPlaceholder")}
           />
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" disabled={!username || !password || loading}>
-            {loading ? "Creating account…" : "Sign Up"}
+            {loading ? t("auth.creatingAccount") : t("auth.submitSignup")}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
+            {t("auth.haveAccount")}{" "}
             <Link href={loginHref} className="font-medium text-brand underline underline-offset-4">
-              Log in
+              {t("auth.logInLink")}
             </Link>
           </p>
         </form>

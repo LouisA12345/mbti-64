@@ -1,6 +1,12 @@
 // Core domain types for the MBTI-64 personality system.
 // 16 MBTI types x 2 Mindset types (O/A) x 2 Lifestyle types (C/H) = 64 personalities.
 
+/** English/Burmese pair for a raw profile-data field. `T` is usually `string` or `string[]`. */
+export interface Bilingual<T> {
+  en: T;
+  my: T;
+}
+
 export const MBTI_TYPES = [
   "INTJ", "INTP", "ENTJ", "ENTP",
   "INFJ", "INFP", "ENFJ", "ENFP",
@@ -49,6 +55,7 @@ export interface Question {
   axis: Axis;
   pole: Pole; // the pole that "Strongly Agree" supports
   text: string;
+  textMy: string;
   category: QuestionCategory;
 }
 

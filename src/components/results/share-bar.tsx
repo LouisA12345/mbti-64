@@ -5,6 +5,7 @@ import { Link2, Check, Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { exportElementToPdf } from "@/lib/pdf";
 import { toast } from "sonner";
+import { useT } from "@/lib/i18n/use-translations";
 import type { PersonalityProfile } from "@/lib/types";
 
 const XLogo = (props: React.SVGProps<SVGSVGElement>) => (
@@ -19,6 +20,7 @@ interface ShareBarProps {
 }
 
 export function ShareBar({ profile, captureElementId }: ShareBarProps) {
+  const t = useT();
   const [copied, setCopied] = useState(false);
   const [exporting, setExporting] = useState(false);
 
@@ -28,10 +30,10 @@ export function ShareBar({ profile, captureElementId }: ShareBarProps) {
     try {
       await navigator.clipboard.writeText(window.location.href);
       setCopied(true);
-      toast.success("Link copied to clipboard");
+      toast.success(t("results.copiedToast"));
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast.error("Couldn't copy the link — copy it from the address bar instead.");
+      toast.error(t("results.copyFailedToast"));
     }
   }
 
@@ -40,7 +42,7 @@ export function ShareBar({ profile, captureElementId }: ShareBarProps) {
     try {
       await exportElementToPdf(captureElementId, `${profile.code}-mbti64.pdf`);
     } catch {
-      toast.error("PDF export failed. Please try again.");
+      toast.error(t("results.pdfFailedToast"));
     } finally {
       setExporting(false);
     }
@@ -54,7 +56,7 @@ export function ShareBar({ profile, captureElementId }: ShareBarProps) {
     <div className="flex flex-wrap items-center gap-2">
       <Button variant="outline" size="sm" onClick={handleCopyLink}>
         {copied ? <Check className="size-4" /> : <Link2 className="size-4" />}
-        {copied ? "Copied" : "Copy Link"}
+        {copied ? t("results.copied") : t("results.copyLink")}
       </Button>
       <Button
         variant="outline"
@@ -64,7 +66,7 @@ export function ShareBar({ profile, captureElementId }: ShareBarProps) {
         }
       >
         <XLogo className="size-3.5" />
-        Share
+        {t("results.share")}
       </Button>
       <Button
         variant="outline"
@@ -84,7 +86,7 @@ export function ShareBar({ profile, captureElementId }: ShareBarProps) {
       </Button>
       <Button variant="default" size="sm" onClick={handleDownloadPdf} disabled={exporting}>
         {exporting ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
-        {exporting ? "Preparing…" : "Download PDF"}
+        {exporting ? t("results.pdfPreparing") : t("results.downloadPdf")}
       </Button>
     </div>
   );

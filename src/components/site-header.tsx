@@ -1,10 +1,16 @@
+"use client";
+
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LanguageToggle } from "@/components/language-toggle";
 import { AuthNav } from "@/components/auth/auth-nav";
 import { MobileNav } from "@/components/mobile-nav";
+import { useT } from "@/lib/i18n/use-translations";
 
 export function SiteHeader() {
+  const t = useT();
+
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
@@ -19,21 +25,22 @@ export function SiteHeader() {
             href="/types"
             className="hidden rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:inline-block"
           >
-            All 64 Types
+            {t("nav.types")}
           </Link>
           <Link
             href="/quiz"
             className="hidden rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:inline-block"
           >
-            Take the Test
+            {t("nav.quiz")}
           </Link>
           <Link
             href="/history"
             className="hidden rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:inline-block"
           >
-            History
+            {t("nav.history")}
           </Link>
           <AuthNav />
+          <LanguageToggle />
           <ThemeToggle />
           <MobileNav />
         </nav>

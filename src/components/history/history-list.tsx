@@ -9,6 +9,8 @@ import { PersonalityIllustration } from "@/components/results/personality-illust
 import { clearHistory, getOrCreateOwnerId, loadHistory, removeFromHistory, type StoredResult } from "@/lib/storage";
 import { encodeScoresToQuery } from "@/lib/scoring";
 import { getProfile } from "@/lib/data/profiles";
+import { useT } from "@/lib/i18n/use-translations";
+import { useLocale } from "@/components/locale-provider";
 import type { PersonalityCode } from "@/lib/types";
 import type { SharedResultEntry } from "@/lib/server/shared-results-store";
 
@@ -32,6 +34,8 @@ function formatDate(timestamp: number): string {
 }
 
 export function HistoryList() {
+  const t = useT();
+  const { locale } = useLocale();
   const [localHistory, setLocalHistory] = useState<StoredResult[] | null>(null);
   const [sharedResults, setSharedResults] = useState<SharedResultEntry[]>([]);
   const [ownerId, setOwnerId] = useState("");
@@ -59,7 +63,7 @@ export function HistoryList() {
   const merged: MergedEntry[] = [
     ...localHistory.map((r) => ({
       key: `you-${r.completedAt}`,
-      name: "You",
+      name: t("history.you"),
       code: r.code,
       scores: r.scores,
       completedAt: r.completedAt,
@@ -93,7 +97,7 @@ export function HistoryList() {
   }
 
   function handleClearAll() {
-    if (!window.confirm("Clear your own saved results? This won't remove results friends added to your history.")) return;
+    if (!window.confirm(t("history.clearConfirm"))) return;
     clearHistory();
     setLocalHistory([]);
   }
@@ -102,16 +106,14 @@ export function HistoryList() {
     <div className="flex flex-col gap-3 rounded-2xl border border-brand/30 bg-brand/5 p-4">
       <p className="flex items-center gap-2 text-sm font-medium">
         <Users className="size-4 text-brand" />
-        Invite friends into your history
+        {t("history.inviteHeading")}
       </p>
-      <p className="text-sm text-muted-foreground">
-        Share this link — when a friend completes the assessment, they can choose to add their result here.
-      </p>
+      <p className="text-sm text-muted-foreground">{t("history.inviteDescription")}</p>
       <div className="flex flex-wrap items-center gap-2">
         <code className="min-w-0 flex-1 truncate rounded-lg bg-background px-3 py-2 text-xs">{inviteUrl}</code>
         <Button size="sm" variant="outline" onClick={handleCopyInvite}>
           {copied ? <Check className="size-3.5" /> : <Link2 className="size-3.5" />}
-          {copied ? "Copied" : "Copy"}
+          {copied ? t("history.copied") : t("history.copy")}
         </Button>
       </div>
     </div>
@@ -124,11 +126,11 @@ export function HistoryList() {
         <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border py-16 text-center">
           <History className="size-8 text-muted-foreground" />
           <div>
-            <p className="font-medium">No results yet</p>
-            <p className="text-sm text-muted-foreground">Your own results, and any a friend adds via your invite link, will show up here.</p>
+            <p className="font-medium">{t("history.emptyTitle")}</p>
+            <p className="text-sm text-muted-foreground">{t("history.emptyDescription")}</p>
           </div>
           <Button render={<Link href="/quiz" />} nativeButton={false}>
-            Take the Assessment
+            {t("history.takeAssessment")}
           </Button>
         </div>
       </div>
@@ -141,17 +143,17 @@ export function HistoryList() {
 
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          {merged.length} saved result{merged.length === 1 ? "" : "s"}, most recent first
+          {t("history.savedCount", { count: merged.length, s: merged.length === 1 ? "" : "s" })}
         </p>
         <Button variant="ghost" size="sm" onClick={handleClearAll}>
           <Trash2 className="size-3.5" />
-          Clear My Results
+          {t("history.clearMine")}
         </Button>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {merged.map((entry) => {
-          const profile = getProfile(entry.code as PersonalityCode);
+          const profile = getProfile(entry.code as PersonalityCode, locale);
           const query = encodeScoresToQuery(entry.scores);
           return (
             <div key={entry.key} className="group relative flex gap-4 rounded-2xl border border-border/60 bg-card p-4">
@@ -190,7 +192,7 @@ export function HistoryList() {
       <div className="flex justify-center pt-4">
         <Button variant="outline" render={<Link href="/quiz" />} nativeButton={false}>
           <RefreshCw className="size-4" />
-          Take It Again
+          {t("history.takeItAgain")}
         </Button>
       </div>
     </div>

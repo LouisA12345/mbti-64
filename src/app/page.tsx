@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   ArrowRight, Sparkles, Compass, Flame, Wind, Anchor, Trophy, HeartHandshake,
@@ -9,6 +11,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { SiteHeader } from "@/components/site-header";
 import { PersonalityIllustration } from "@/components/results/personality-illustration";
 import { getProfile } from "@/lib/data/profiles";
+import { useT } from "@/lib/i18n/use-translations";
+import { useLocale } from "@/components/locale-provider";
+import type { DictKey } from "@/lib/i18n/dictionary";
 import type { PersonalityCode } from "@/lib/types";
 
 const PREVIEW_CODES: PersonalityCode[] = [
@@ -16,15 +21,17 @@ const PREVIEW_CODES: PersonalityCode[] = [
   "INTJ-A-C", "ESFP-O-C", "ISTP-A-H", "ENFJ-O-H",
 ];
 
-const STATS = [
-  { label: "Personality Types", value: "64" },
-  { label: "Assessment Questions", value: "72" },
-  { label: "Scored Dimensions", value: "6" },
-  { label: "Avg. Completion", value: "~7 min" },
+const STATS: { labelKey: DictKey; value: string }[] = [
+  { labelKey: "home.stat.types", value: "64" },
+  { labelKey: "home.stat.questions", value: "72" },
+  { labelKey: "home.stat.dimensions", value: "6" },
+  { labelKey: "home.stat.completion", value: "~7 min" },
 ];
 
 export default function Home() {
-  const previews = PREVIEW_CODES.map(getProfile);
+  const t = useT();
+  const { locale } = useLocale();
+  const previews = PREVIEW_CODES.map((code) => getProfile(code, locale));
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -39,30 +46,26 @@ export default function Home() {
           <div className="relative mx-auto flex max-w-4xl flex-col items-center gap-6 px-4 py-20 text-center sm:px-6 sm:py-28">
             <Badge variant="outline" className="gap-1.5 border-brand/40 px-3 py-1 text-brand">
               <Sparkles className="size-3.5" />
-              Not your standard 16-type test
+              {t("home.badge")}
             </Badge>
             <h1 className="text-balance font-heading text-4xl font-semibold tracking-tight sm:text-6xl">
-              Discover your full <span className="text-gradient-brand">personality code</span>
+              {t("home.heroTitle1")} <span className="text-gradient-brand">{t("home.heroTitle2")}</span>
             </h1>
-            <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
-              MBTI-64 combines your core personality type with how you engage with change and how you pursue your
-              goals — <span className="font-medium text-foreground">16 MBTI types × 2 Mindsets × 2 Lifestyles</span> —
-              for 64 distinct, richly-drawn personalities.
-            </p>
+            <p className="max-w-2xl text-pretty text-lg text-muted-foreground">{t("home.heroDescription")}</p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button size="lg" className="bg-gradient-brand text-white hover:opacity-90" nativeButton={false} render={<Link href="/quiz" />}>
-                Start the Assessment
+                {t("home.startAssessment")}
                 <ArrowRight className="size-4" />
               </Button>
               <Button size="lg" variant="outline" nativeButton={false} render={<Link href="/types" />}>
-                Browse All 64 Types
+                {t("home.browseTypes")}
               </Button>
             </div>
             <div className="mt-6 grid w-full max-w-2xl grid-cols-2 gap-6 border-t border-border/60 pt-8 sm:grid-cols-4">
               {STATS.map((s) => (
-                <div key={s.label} className="flex flex-col gap-1">
+                <div key={s.labelKey} className="flex flex-col gap-1">
                   <span className="font-heading text-2xl font-semibold sm:text-3xl">{s.value}</span>
-                  <span className="text-xs text-muted-foreground sm:text-sm">{s.label}</span>
+                  <span className="text-xs text-muted-foreground sm:text-sm">{t(s.labelKey)}</span>
                 </div>
               ))}
             </div>
@@ -72,42 +75,40 @@ export default function Home() {
         {/* The formula */}
         <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
           <div className="mb-12 flex flex-col items-center gap-3 text-center">
-            <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">The Formula</h2>
-            <p className="max-w-xl text-muted-foreground">
-              Three independent dimensions combine into a single, unmistakably specific personality code.
-            </p>
+            <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">{t("home.formula.heading")}</h2>
+            <p className="max-w-xl text-muted-foreground">{t("home.formula.description")}</p>
           </div>
           <div className="grid gap-6 lg:grid-cols-3">
             <FormulaCard
               icon={Compass}
-              eyebrow="16 Types"
-              title="MBTI"
-              description="Your core cognitive wiring across four classic axes."
+              eyebrow={t("home.formula.mbti.eyebrow")}
+              title={t("home.formula.mbti.title")}
+              description={t("home.formula.mbti.description")}
               rows={[
-                ["E", "Extraversion", "I", "Introversion"],
-                ["S", "Sensing", "N", "Intuition"],
-                ["T", "Thinking", "F", "Feeling"],
-                ["J", "Judging", "P", "Perceiving"],
+                ["E", t("home.axis.E"), "I", t("home.axis.I")],
+                ["S", t("home.axis.S"), "N", t("home.axis.N")],
+                ["T", t("home.axis.T"), "F", t("home.axis.F")],
+                ["J", t("home.axis.J"), "P", t("home.axis.P")],
               ]}
             />
             <FormulaCard
               icon={Wind}
-              eyebrow="2 Types"
-              title="Mindset"
-              description="How you relate to novelty, change, and the unknown."
+              eyebrow={t("home.formula.mindset.eyebrow")}
+              title={t("home.formula.mindset.title")}
+              description={t("home.formula.mindset.description")}
               pairs={[
-                { icon: Sparkles, letter: "O", name: "Open", traits: "Curious · Explorative · Adaptable" },
-                { icon: Anchor, letter: "A", name: "Anchored", traits: "Stable · Structured · Consistent" },
+                { icon: Sparkles, letter: "O", name: t("home.mindset.open.name"), traits: t("home.mindset.open.traits") },
+                { icon: Anchor, letter: "A", name: t("home.mindset.anchored.name"), traits: t("home.mindset.anchored.traits") },
               ]}
             />
             <FormulaCard
               icon={Flame}
-              eyebrow="2 Types"
-              title="Lifestyle"
-              description="How you pursue goals and relate to the people around you."
+              eyebrow={t("home.formula.lifestyle.eyebrow")}
+              title={t("home.formula.lifestyle.title")}
+              description={t("home.formula.lifestyle.description")}
               pairs={[
-                { icon: Trophy, letter: "C", name: "Competitive", traits: "Ambitious · Driven · Bold" },
-                { icon: HeartHandshake, letter: "H", name: "Harmonious", traits: "Balanced · Supportive · Calm" },
+                { icon: Trophy, letter: "C", name: t("home.lifestyle.competitive.name"), traits: t("home.lifestyle.competitive.traits") },
+                { icon: HeartHandshake, letter: "H", name: t("home.lifestyle.harmonious.name"), traits: t("home.lifestyle.harmonious.traits") },
               ]}
             />
           </div>
@@ -117,28 +118,13 @@ export default function Home() {
         <section className="border-y border-border/60 bg-muted/30">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
             <div className="mb-12 flex flex-col items-center gap-3 text-center">
-              <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">How It Works</h2>
-              <p className="max-w-xl text-muted-foreground">Three steps between you and your full personality code.</p>
+              <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">{t("home.howItWorks.heading")}</h2>
+              <p className="max-w-xl text-muted-foreground">{t("home.howItWorks.description")}</p>
             </div>
             <div className="grid gap-8 sm:grid-cols-3">
-              <Step
-                icon={ListChecks}
-                step="01"
-                title="Answer honestly"
-                description="72 quick 5-point questions, shuffled every session, covering MBTI, Mindset, and Lifestyle."
-              />
-              <Step
-                icon={ScanEye}
-                step="02"
-                title="We score six dimensions"
-                description="Each axis is scored independently, then combined into your final three-part code."
-              />
-              <Step
-                icon={Sparkles}
-                step="03"
-                title="Get your full profile"
-                description="A rich, shareable breakdown of your strengths, career fit, relationships, and more."
-              />
+              <Step icon={ListChecks} step="01" title={t("home.step1.title")} description={t("home.step1.description")} />
+              <Step icon={ScanEye} step="02" title={t("home.step2.title")} description={t("home.step2.description")} />
+              <Step icon={Sparkles} step="03" title={t("home.step3.title")} description={t("home.step3.description")} />
             </div>
           </div>
         </section>
@@ -146,8 +132,8 @@ export default function Home() {
         {/* Preview grid */}
         <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
           <div className="mb-10 flex flex-col items-center gap-3 text-center">
-            <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">A Glimpse of the 64</h2>
-            <p className="max-w-xl text-muted-foreground">Every type gets its own name, palette, and full profile.</p>
+            <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">{t("home.preview.heading")}</h2>
+            <p className="max-w-xl text-muted-foreground">{t("home.preview.description")}</p>
           </div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {previews.map((profile) => (
@@ -168,7 +154,7 @@ export default function Home() {
           </div>
           <div className="mt-8 flex justify-center">
             <Button variant="outline" nativeButton={false} render={<Link href="/types" />}>
-              See All 64 Types
+              {t("home.seeAll")}
               <ArrowRight className="size-4" />
             </Button>
           </div>
@@ -177,10 +163,10 @@ export default function Home() {
         {/* CTA */}
         <section className="mx-auto max-w-4xl px-4 pb-24 sm:px-6">
           <div className="flex flex-col items-center gap-6 rounded-3xl bg-gradient-brand p-10 text-center text-white sm:p-16">
-            <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">Ready to find your personality type?</h2>
-            <p className="max-w-xl text-white/85">About seven minutes. No sign-up. Your progress autosaves as you go.</p>
+            <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">{t("home.cta.heading")}</h2>
+            <p className="max-w-xl text-white/85">{t("home.cta.description")}</p>
             <Button size="lg" variant="secondary" className="text-foreground" nativeButton={false} render={<Link href="/quiz" />}>
-              Start the Assessment
+              {t("home.startAssessment")}
               <ArrowRight className="size-4" />
             </Button>
           </div>
@@ -188,7 +174,7 @@ export default function Home() {
       </main>
       <footer className="border-t border-border/60 py-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-2 px-4 text-center text-sm text-muted-foreground sm:px-6">
-          <span>MBTI-64 is an original 64-type personality framework, built by Louis as a personal hobby project.</span>
+          <span>{t("footer.credit")}</span>
         </div>
       </footer>
     </div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { User, LogOut } from "lucide-react";
+import { useT } from "@/lib/i18n/use-translations";
 
 interface AuthNavProps {
   /** "desktop" (default) hides itself below the sm breakpoint, for the horizontal header nav.
@@ -14,6 +15,7 @@ interface AuthNavProps {
 
 export function AuthNav({ variant = "desktop", onNavigate }: AuthNavProps) {
   const router = useRouter();
+  const t = useT();
   // undefined = still checking, null = logged out, string = logged in as this username.
   const [username, setUsername] = useState<string | null | undefined>(undefined);
 
@@ -52,20 +54,20 @@ export function AuthNav({ variant = "desktop", onNavigate }: AuthNavProps) {
             </Link>
             <button type="button" onClick={handleLogout} className={linkClass}>
               <LogOut className="size-3.5" />
-              Log Out
+              {t("nav.logOut")}
             </button>
           </>
         ) : (
           <>
             <Link href="/login" onClick={onNavigate} className={linkClass}>
-              Log In
+              {t("nav.logIn")}
             </Link>
             <Link
               href="/signup"
               onClick={onNavigate}
               className="rounded-md bg-gradient-brand px-3 py-2.5 text-center text-sm font-medium text-white transition-opacity hover:opacity-90"
             >
-              Sign Up
+              {t("nav.signUp")}
             </Link>
           </>
         )}
@@ -86,7 +88,7 @@ export function AuthNav({ variant = "desktop", onNavigate }: AuthNavProps) {
         </Link>
         <button type="button" onClick={handleLogout} className={desktopLinkClass}>
           <LogOut className="size-3.5" />
-          Log Out
+          {t("nav.logOut")}
         </button>
       </>
     );
@@ -98,13 +100,13 @@ export function AuthNav({ variant = "desktop", onNavigate }: AuthNavProps) {
         href="/login"
         className="hidden rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:inline-block"
       >
-        Log In
+        {t("nav.logIn")}
       </Link>
       <Link
         href="/signup"
         className="hidden rounded-md bg-gradient-brand px-3 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 sm:inline-block"
       >
-        Sign Up
+        {t("nav.signUp")}
       </Link>
     </>
   );

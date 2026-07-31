@@ -1,7 +1,9 @@
 "use client";
 
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from "recharts";
-import { AXES, AXIS_LABELS, type DimensionScores } from "@/lib/types";
+import { AXES, type DimensionScores } from "@/lib/types";
+import { AXIS_LABEL_KEYS } from "@/lib/i18n/dictionary";
+import { useT } from "@/lib/i18n/use-translations";
 
 interface RadarChartCardProps {
   scores: DimensionScores;
@@ -9,8 +11,9 @@ interface RadarChartCardProps {
 }
 
 export function RadarChartCard({ scores, color = "#8b5cf6" }: RadarChartCardProps) {
+  const t = useT();
   const data = AXES.map((axis) => ({
-    axis: AXIS_LABELS[axis].positive,
+    axis: t(AXIS_LABEL_KEYS[axis].positive),
     value: scores[axis],
     fullMark: 100,
   }));
@@ -22,7 +25,7 @@ export function RadarChartCard({ scores, color = "#8b5cf6" }: RadarChartCardProp
           <PolarGrid stroke="var(--border)" />
           <PolarAngleAxis dataKey="axis" tick={{ fill: "var(--muted-foreground)", fontSize: 12 }} />
           <PolarRadiusAxis angle={90} domain={[0, 100]} tick={false} axisLine={false} />
-          <Radar name="Score" dataKey="value" stroke={color} fill={color} fillOpacity={0.35} strokeWidth={2} />
+          <Radar name={t("results.score")} dataKey="value" stroke={color} fill={color} fillOpacity={0.35} strokeWidth={2} />
           <Tooltip
             contentStyle={{
               backgroundColor: "var(--popover)",
@@ -31,7 +34,7 @@ export function RadarChartCard({ scores, color = "#8b5cf6" }: RadarChartCardProp
               color: "var(--popover-foreground)",
               fontSize: 13,
             }}
-            formatter={(value) => [`${value}%`, "Score"]}
+            formatter={(value) => [`${value}%`, t("results.score")]}
           />
         </RadarChart>
       </ResponsiveContainer>

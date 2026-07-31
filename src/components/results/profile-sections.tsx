@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Compass, Sparkles, Award, EyeOff, MessageCircle, Heart, Users, Baby,
   Crown, Briefcase, Hammer, Scale, Puzzle, Palette, GraduationCap,
@@ -12,10 +14,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
+import { useT } from "@/lib/i18n/use-translations";
+import type { DictKey } from "@/lib/i18n/dictionary";
 import type { PersonalityProfile } from "@/lib/types";
 
 interface Section {
-  title: string;
+  id: string;
+  titleKey: DictKey;
   icon: LucideIcon;
   content: string | string[];
   variant?: "badges" | "list";
@@ -23,46 +28,47 @@ interface Section {
 
 function buildSections(profile: PersonalityProfile): Section[] {
   return [
-    { title: "Overview", icon: Compass, content: profile.description },
-    { title: "Core Motivation", icon: Sparkles, content: profile.coreMotivation },
-    { title: "Biggest Strengths", icon: Award, content: profile.strengths },
-    { title: "Blind Spots", icon: EyeOff, content: profile.weaknesses },
-    { title: "Communication", icon: MessageCircle, content: profile.communicationStyle },
-    { title: "Relationships", icon: Heart, content: profile.relationshipStyle },
-    { title: "Friendships", icon: Users, content: profile.friendshipStyle },
-    { title: "Parenting", icon: Baby, content: profile.parentingStyle },
-    { title: "Leadership", icon: Crown, content: profile.leadershipStyle },
-    { title: "Career", icon: Briefcase, content: profile.idealTeamRole },
-    { title: "Work Style", icon: Hammer, content: profile.workStyle },
-    { title: "Decision Making", icon: Scale, content: profile.decisionStyle },
-    { title: "Problem Solving", icon: Puzzle, content: profile.problemSolving },
-    { title: "Creativity", icon: Palette, content: profile.creativity },
-    { title: "Learning Style", icon: GraduationCap, content: profile.learningStyle },
-    { title: "Stress Response", icon: Flame, content: profile.stressResponse },
-    { title: "Conflict Style", icon: Swords, content: profile.conflictStyle },
-    { title: "Personal Growth", icon: TrendingUp, content: profile.growthAdvice },
-    { title: "Suggestions For You", icon: Lightbulb, content: profile.suggestions, variant: "list" },
-    { title: "Ideal Careers", icon: Target, content: profile.careerPaths },
-    { title: "Careers to Avoid", icon: Ban, content: profile.careersToAvoid },
-    { title: "Famous Characters", icon: Star, content: profile.famousExamples },
-    { title: "Daily Habits", icon: ListChecks, content: profile.dailyHabits },
-    { title: "Favorite Work Environment", icon: Building2, content: profile.bestEnvironment },
-    { title: "Life Motto", icon: MottoIcon, content: profile.lifeMotto },
-    { title: "Quote", icon: QuoteIcon, content: `"${profile.quote}"` },
+    { id: "overview", titleKey: "section.overview", icon: Compass, content: profile.description },
+    { id: "coreMotivation", titleKey: "section.coreMotivation", icon: Sparkles, content: profile.coreMotivation },
+    { id: "strengths", titleKey: "section.strengths", icon: Award, content: profile.strengths },
+    { id: "weaknesses", titleKey: "section.weaknesses", icon: EyeOff, content: profile.weaknesses },
+    { id: "communication", titleKey: "section.communication", icon: MessageCircle, content: profile.communicationStyle },
+    { id: "relationships", titleKey: "section.relationships", icon: Heart, content: profile.relationshipStyle },
+    { id: "friendships", titleKey: "section.friendships", icon: Users, content: profile.friendshipStyle },
+    { id: "parenting", titleKey: "section.parenting", icon: Baby, content: profile.parentingStyle },
+    { id: "leadership", titleKey: "section.leadership", icon: Crown, content: profile.leadershipStyle },
+    { id: "career", titleKey: "section.career", icon: Briefcase, content: profile.idealTeamRole },
+    { id: "workStyle", titleKey: "section.workStyle", icon: Hammer, content: profile.workStyle },
+    { id: "decisionMaking", titleKey: "section.decisionMaking", icon: Scale, content: profile.decisionStyle },
+    { id: "problemSolving", titleKey: "section.problemSolving", icon: Puzzle, content: profile.problemSolving },
+    { id: "creativity", titleKey: "section.creativity", icon: Palette, content: profile.creativity },
+    { id: "learningStyle", titleKey: "section.learningStyle", icon: GraduationCap, content: profile.learningStyle },
+    { id: "stressResponse", titleKey: "section.stressResponse", icon: Flame, content: profile.stressResponse },
+    { id: "conflictStyle", titleKey: "section.conflictStyle", icon: Swords, content: profile.conflictStyle },
+    { id: "personalGrowth", titleKey: "section.personalGrowth", icon: TrendingUp, content: profile.growthAdvice },
+    { id: "suggestions", titleKey: "section.suggestions", icon: Lightbulb, content: profile.suggestions, variant: "list" },
+    { id: "idealCareers", titleKey: "section.idealCareers", icon: Target, content: profile.careerPaths },
+    { id: "careersToAvoid", titleKey: "section.careersToAvoid", icon: Ban, content: profile.careersToAvoid },
+    { id: "famousCharacters", titleKey: "section.famousCharacters", icon: Star, content: profile.famousExamples },
+    { id: "dailyHabits", titleKey: "section.dailyHabits", icon: ListChecks, content: profile.dailyHabits },
+    { id: "bestEnvironment", titleKey: "section.bestEnvironment", icon: Building2, content: profile.bestEnvironment },
+    { id: "lifeMotto", titleKey: "section.lifeMotto", icon: MottoIcon, content: profile.lifeMotto },
+    { id: "quote", titleKey: "section.quote", icon: QuoteIcon, content: `"${profile.quote}"` },
   ];
 }
 
 export function ProfileSections({ profile }: { profile: PersonalityProfile }) {
+  const t = useT();
   const sections = buildSections(profile);
 
   return (
-    <Accordion multiple defaultValue={["Overview", "Core Motivation"]} className="w-full">
-      {sections.map(({ title, icon: Icon, content, variant = "badges" }) => (
-        <AccordionItem key={title} value={title}>
+    <Accordion multiple defaultValue={["overview", "coreMotivation"]} className="w-full">
+      {sections.map(({ id, titleKey, icon: Icon, content, variant = "badges" }) => (
+        <AccordionItem key={id} value={id}>
           <AccordionTrigger className="font-heading text-base">
             <span className="flex items-center gap-2.5">
               <Icon className="size-4 text-brand" />
-              {title}
+              {t(titleKey)}
             </span>
           </AccordionTrigger>
           <AccordionContent>

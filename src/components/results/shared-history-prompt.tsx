@@ -5,6 +5,7 @@ import { Users, Check, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useT } from "@/lib/i18n/use-translations";
 import type { DimensionScores, PersonalityCode } from "@/lib/types";
 
 interface SharedHistoryPromptProps {
@@ -14,6 +15,7 @@ interface SharedHistoryPromptProps {
 }
 
 export function SharedHistoryPrompt({ ownerId, code, scores }: SharedHistoryPromptProps) {
+  const t = useT();
   const [name, setName] = useState("");
   const [status, setStatus] = useState<"idle" | "submitting" | "done" | "error">("idle");
 
@@ -40,7 +42,8 @@ export function SharedHistoryPrompt({ ownerId, code, scores }: SharedHistoryProm
         <CardContent className="flex items-center gap-3 p-4 text-sm">
           <Check className="size-4 shrink-0 text-brand" />
           <span>
-            Added! <span className="font-medium text-foreground">{name.trim()}</span> will see this result in their History.
+            {t("results.addedToHistory1")} <span className="font-medium text-foreground">{name.trim()}</span>{" "}
+            {t("results.addedToHistory2")}
           </span>
         </CardContent>
       </Card>
@@ -52,23 +55,23 @@ export function SharedHistoryPrompt({ ownerId, code, scores }: SharedHistoryProm
       <CardContent className="flex flex-col gap-3 p-4">
         <p className="flex items-center gap-2 text-sm">
           <Users className="size-4 shrink-0 text-brand" />
-          You got here through a friend&rsquo;s invite link. Add your result to their History?
+          {t("results.sharedPromptQuestion")}
         </p>
         <form onSubmit={handleSubmit} className="flex flex-wrap gap-2">
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Your name"
+            placeholder={t("results.yourNamePlaceholder")}
             maxLength={40}
             className="max-w-[200px]"
             disabled={status === "submitting"}
           />
           <Button type="submit" size="sm" disabled={!name.trim() || status === "submitting"}>
             {status === "submitting" ? <Loader2 className="size-4 animate-spin" /> : null}
-            Add to Their History
+            {t("results.addToHistory")}
           </Button>
         </form>
-        {status === "error" && <p className="text-sm text-destructive">Something went wrong — please try again.</p>}
+        {status === "error" && <p className="text-sm text-destructive">{t("results.sharedPromptError")}</p>}
       </CardContent>
     </Card>
   );

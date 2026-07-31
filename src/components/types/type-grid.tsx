@@ -7,16 +7,18 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { PersonalityIllustration } from "@/components/results/personality-illustration";
 import { cn } from "@/lib/utils";
-import type { MindsetType, LifestyleType, PersonalityProfile } from "@/lib/types";
-
-interface TypeGridProps {
-  profiles: PersonalityProfile[];
-}
+import { useT } from "@/lib/i18n/use-translations";
+import { useLocale } from "@/components/locale-provider";
+import { getAllProfiles } from "@/lib/data/profiles";
+import type { MindsetType, LifestyleType } from "@/lib/types";
 
 type MindsetFilter = MindsetType | "ALL";
 type LifestyleFilter = LifestyleType | "ALL";
 
-export function TypeGrid({ profiles }: TypeGridProps) {
+export function TypeGrid() {
+  const t = useT();
+  const { locale } = useLocale();
+  const profiles = useMemo(() => getAllProfiles(locale), [locale]);
   const [query, setQuery] = useState("");
   const [mindset, setMindset] = useState<MindsetFilter>("ALL");
   const [lifestyle, setLifestyle] = useState<LifestyleFilter>("ALL");
@@ -43,23 +45,23 @@ export function TypeGrid({ profiles }: TypeGridProps) {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by code or title…"
+            placeholder={t("types.searchPlaceholder")}
             className="pl-9"
           />
         </div>
         <div className="flex flex-wrap gap-2">
-          <FilterChip label="All Mindsets" active={mindset === "ALL"} onClick={() => setMindset("ALL")} />
-          <FilterChip label="Open" active={mindset === "O"} onClick={() => setMindset("O")} />
-          <FilterChip label="Anchored" active={mindset === "A"} onClick={() => setMindset("A")} />
+          <FilterChip label={t("types.filter.allMindsets")} active={mindset === "ALL"} onClick={() => setMindset("ALL")} />
+          <FilterChip label={t("types.filter.open")} active={mindset === "O"} onClick={() => setMindset("O")} />
+          <FilterChip label={t("types.filter.anchored")} active={mindset === "A"} onClick={() => setMindset("A")} />
           <span className="mx-1 hidden text-border sm:inline">|</span>
-          <FilterChip label="All Lifestyles" active={lifestyle === "ALL"} onClick={() => setLifestyle("ALL")} />
-          <FilterChip label="Competitive" active={lifestyle === "C"} onClick={() => setLifestyle("C")} />
-          <FilterChip label="Harmonious" active={lifestyle === "H"} onClick={() => setLifestyle("H")} />
+          <FilterChip label={t("types.filter.allLifestyles")} active={lifestyle === "ALL"} onClick={() => setLifestyle("ALL")} />
+          <FilterChip label={t("types.filter.competitive")} active={lifestyle === "C"} onClick={() => setLifestyle("C")} />
+          <FilterChip label={t("types.filter.harmonious")} active={lifestyle === "H"} onClick={() => setLifestyle("H")} />
         </div>
       </div>
 
       <p className="text-sm text-muted-foreground">
-        Showing {filtered.length} of {profiles.length} personalities
+        {t("types.showingCount", { shown: filtered.length, total: profiles.length })}
       </p>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
