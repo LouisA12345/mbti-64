@@ -112,7 +112,7 @@ export const dictionary = {
   "home.seeAll": { en: "See All 64 Types", my: "အားလုံး ၆၄ မျိုးကို ကြည့်ရှုရန်" },
 
   "home.cta.heading": { en: "Ready to find your personality type?", my: "သင့်ပင်ကိုယ်စရိုက် အမျိုးအစားကို ရှာဖွေဖို့ အသင့်ရှိပါပြီလား။" },
-  "home.cta.description": { en: "About seven minutes. No sign-up. Your progress autosaves as you go.", my: "မိနစ် ၇ မိနစ်ခန့်သာ ကြာပါမည်။ အကောင့်ဖွင့်စရာမလို။ သင့်တိုးတက်မှုကို အလိုအလျောက် သိမ်းဆည်းပေးပါသည်။" },
+  "home.cta.description": { en: "About seven minutes. Free to join. Your progress autosaves as you go.", my: "မိနစ် ၇ မိနစ်ခန့်သာ ကြာပါမည်။ အခမဲ့ ပါဝင်နိုင်ပါသည်။ သင့်တိုးတက်မှုကို အလိုအလျောက် သိမ်းဆည်းပေးပါသည်။" },
 
   // Types page
   "types.heading": { en: "All 64 Personality Types", my: "ပင်ကိုယ်စရိုက် အမျိုးအစား ၆၄ မျိုးလုံး" },
