@@ -14,9 +14,10 @@ interface PrintableResultProps {
 
 /**
  * Off-screen, fixed-width, always-expanded, light-background rendition of the full result —
- * captured by html2canvas for the PDF export. The on-page hero/accordion stay exactly as
- * designed for screen use; this exists purely so the exported PDF can include every section
- * (not just the hero card) with print-friendly contrast regardless of the site's active theme.
+ * captured by html2canvas for the PDF export, one direct child ("data-pdf-block") at a time, so
+ * pdf.ts can lay each block onto whichever page has room instead of slicing one giant image by
+ * raw pixel height (which used to cut lines of text in half across a page boundary). The on-page
+ * hero/accordion stay exactly as designed for screen use — this exists purely for the export.
  */
 export function PrintableResult({ id, profile, scores }: PrintableResultProps) {
   const t = useT();
@@ -33,12 +34,11 @@ export function PrintableResult({ id, profile, scores }: PrintableResultProps) {
         width: "820px",
         backgroundColor: "#ffffff",
         color: "#18181b",
-        padding: "48px",
         fontFamily: "var(--font-sans), var(--font-myanmar), sans-serif",
       }}
     >
       {/* Masthead */}
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "28px" }}>
+      <div data-pdf-block style={{ display: "flex", alignItems: "center", gap: "10px", padding: "0 48px" }}>
         <div
           style={{
             width: "32px",
@@ -53,7 +53,7 @@ export function PrintableResult({ id, profile, scores }: PrintableResultProps) {
       </div>
 
       {/* Hero block */}
-      <div style={{ marginBottom: "36px" }}>
+      <div data-pdf-block style={{ padding: "0 48px" }}>
         <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "12px" }}>
           <span
             style={{
@@ -102,7 +102,7 @@ export function PrintableResult({ id, profile, scores }: PrintableResultProps) {
       </div>
 
       {/* Dimension scores */}
-      <div style={{ marginBottom: "36px" }}>
+      <div data-pdf-block style={{ padding: "0 48px" }}>
         <h2 style={{ fontFamily: "var(--font-sora), sans-serif", fontSize: "17px", fontWeight: 600, margin: "0 0 16px" }}>
           {t("results.dimensionRadar")}
         </h2>
@@ -126,59 +126,65 @@ export function PrintableResult({ id, profile, scores }: PrintableResultProps) {
         })}
       </div>
 
-      {/* Full section breakdown */}
-      <div>
-        <h2 style={{ fontFamily: "var(--font-sora), sans-serif", fontSize: "17px", fontWeight: 600, margin: "0 0 16px" }}>
+      {/* Full section breakdown — heading is its own block, then each section is its own block,
+          so the PDF layout can start any one of them on a fresh page without ever splitting a
+          paragraph or list mid-line. */}
+      <div data-pdf-block style={{ padding: "0 48px" }}>
+        <h2 style={{ fontFamily: "var(--font-sora), sans-serif", fontSize: "17px", fontWeight: 600, margin: 0 }}>
           {t("results.fullPicture")}
         </h2>
-        {sections.map(({ id: sectionId, titleKey, content, variant = "badges" }) => (
-          <div key={sectionId} style={{ marginBottom: "22px", pageBreakInside: "avoid" }}>
-            <h3
-              style={{
-                fontFamily: "var(--font-sora), sans-serif",
-                fontSize: "14px",
-                fontWeight: 600,
-                margin: "0 0 8px",
-                color: primary,
-              }}
-            >
-              {t(titleKey)}
-            </h3>
-            {Array.isArray(content) ? (
-              variant === "list" ? (
-                <ul style={{ margin: 0, paddingLeft: "18px", color: "#3f3f46", lineHeight: 1.6, fontSize: "13px" }}>
-                  {content.map((item) => (
-                    <li key={item} style={{ marginBottom: "4px" }}>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-                  {content.map((item) => (
-                    <span
-                      key={item}
-                      style={{
-                        fontSize: "12px",
-                        padding: "4px 10px",
-                        borderRadius: "999px",
-                        backgroundColor: "#f4f4f5",
-                        color: "#3f3f46",
-                      }}
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </div>
-              )
-            ) : (
-              <p style={{ margin: 0, color: "#3f3f46", lineHeight: 1.6, fontSize: "13px" }}>{content}</p>
-            )}
-          </div>
-        ))}
       </div>
 
-      <div style={{ marginTop: "36px", paddingTop: "16px", borderTop: "1px solid #e4e4e7", fontSize: "11px", color: "#a1a1aa" }}>
+      {sections.map(({ id: sectionId, titleKey, content, variant = "badges" }) => (
+        <div key={sectionId} data-pdf-block style={{ padding: "0 48px" }}>
+          <h3
+            style={{
+              fontFamily: "var(--font-sora), sans-serif",
+              fontSize: "14px",
+              fontWeight: 600,
+              margin: "0 0 8px",
+              color: primary,
+            }}
+          >
+            {t(titleKey)}
+          </h3>
+          {Array.isArray(content) ? (
+            variant === "list" ? (
+              <ul style={{ margin: 0, paddingLeft: "18px", color: "#3f3f46", lineHeight: 1.6, fontSize: "13px" }}>
+                {content.map((item) => (
+                  <li key={item} style={{ marginBottom: "4px" }}>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                {content.map((item) => (
+                  <span
+                    key={item}
+                    style={{
+                      fontSize: "12px",
+                      padding: "4px 10px",
+                      borderRadius: "999px",
+                      backgroundColor: "#f4f4f5",
+                      color: "#3f3f46",
+                    }}
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+            )
+          ) : (
+            <p style={{ margin: 0, color: "#3f3f46", lineHeight: 1.6, fontSize: "13px" }}>{content}</p>
+          )}
+        </div>
+      ))}
+
+      <div
+        data-pdf-block
+        style={{ padding: "0 48px", borderTop: "1px solid #e4e4e7", paddingTop: "16px", fontSize: "11px", color: "#a1a1aa" }}
+      >
         MBTI-64 — {profile.code}
       </div>
     </div>
