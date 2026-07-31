@@ -76,14 +76,12 @@ export async function createUser(username: string, password: string): Promise<Cr
 }
 
 /**
- * All registered accounts, most recently created first — for the admin dashboard. Scans Redis
- * directly for every `mbti64:user:*` key rather than relying on a separately-maintained index,
- * so accounts created before this existed still show up.
+ * Best-effort key enumeration via SCAN. Some managed Redis providers (including Vercel's
+ * marketplace-provisioned KV) restrict or no-op iteration commands, so this must never throw —
+ * on any failure it just returns what it found so far and callers fall back to other sources.
  */
-export async function getAllUsers(): Promise<UserAccount[]> {
-  const redis = getRedisClient();
-  let accounts: UserAccount[];
-  if (redis) {
+async function scanUserKeys(redis: NonNullable<ReturnType<typeof getRedisClient>>): Promise<string[]> {
+  try {
     const keys: string[] = [];
     let cursor: string | number = 0;
     do {
@@ -91,7 +89,25 @@ export async function getAllUsers(): Promise<UserAccount[]> {
       keys.push(...result[1]);
       cursor = result[0];
     } while (cursor !== "0");
+    return keys;
+  } catch {
+    return [];
+  }
+}
 
+/**
+ * All registered accounts, most recently created first — for the admin dashboard. Combines a
+ * best-effort Redis SCAN with an explicit list of usernames known from elsewhere (e.g. the
+ * completed-assessment log), since SCAN alone isn't reliable on every managed Redis provider and
+ * accounts created before this feature existed were never indexed any other way.
+ */
+export async function getAllUsers(alsoKnownUsernames: string[] = []): Promise<UserAccount[]> {
+  const redis = getRedisClient();
+  let accounts: UserAccount[];
+  if (redis) {
+    const scannedKeys = await scanUserKeys(redis);
+    const knownKeys = alsoKnownUsernames.map((u) => redisKey(u));
+    const keys = Array.from(new Set([...scannedKeys, ...knownKeys]));
     if (keys.length === 0) return [];
     const results = await redis.mget<(UserAccount | null)[]>(...keys);
     accounts = results.filter((a): a is UserAccount => a !== null);

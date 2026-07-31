@@ -36,7 +36,9 @@ export default async function AdminPage() {
     redirect("/admin/login");
   }
 
-  const [results, accounts] = await Promise.all([getAllResults(), getAllUsers()]);
+  const results = await getAllResults();
+  const verifiedUsernames = Array.from(new Set(results.filter((r) => r.verified).map((r) => r.name)));
+  const accounts = await getAllUsers(verifiedUsernames);
   const users = accounts.map(({ username, createdAt }) => ({ username, createdAt }));
   const kvStatus = getKvStatus();
 
