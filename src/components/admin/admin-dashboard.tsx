@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut, ShieldCheck, Database, AlertTriangle, BadgeCheck, Search } from "lucide-react";
+import { LogOut, ShieldCheck, Database, AlertTriangle, BadgeCheck, Search, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -24,14 +24,29 @@ function formatDate(timestamp: number): string {
   });
 }
 
+interface AccountSummary {
+  username: string;
+  createdAt: number;
+}
+
 interface AdminDashboardProps {
   results: GlobalResultEntry[];
+  users: AccountSummary[];
   kvStatus: ReturnType<typeof getKvStatus>;
 }
 
-export function AdminDashboard({ results, kvStatus }: AdminDashboardProps) {
+export function AdminDashboard({ results, users, kvStatus }: AdminDashboardProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
+
+  const resultCountByUsername = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const r of results) {
+      if (!r.verified) continue;
+      counts.set(r.name, (counts.get(r.name) ?? 0) + 1);
+    }
+    return counts;
+  }, [results]);
 
   async function handleLogout() {
     await fetch("/api/admin/logout", { method: "POST" });
@@ -75,6 +90,37 @@ export function AdminDashboard({ results, kvStatus }: AdminDashboardProps) {
           serverless filesystem. Connect a database from the project&rsquo;s Storage tab, then redeploy.
         </div>
       )}
+
+      <div className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-card p-4">
+        <p className="flex items-center gap-2 text-sm font-medium">
+          <Users className="size-4 text-brand" />
+          Registered Accounts ({users.length})
+        </p>
+        {users.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No accounts have signed up yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/60 text-left text-xs text-muted-foreground">
+                  <th className="pb-2 pr-4 font-medium">Username</th>
+                  <th className="pb-2 pr-4 font-medium">Signed Up</th>
+                  <th className="pb-2 font-medium">Results</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((u) => (
+                  <tr key={u.username} className="border-b border-border/40 last:border-0">
+                    <td className="py-2 pr-4 font-medium">{u.username}</td>
+                    <td className="py-2 pr-4 text-muted-foreground">{formatDate(u.createdAt)}</td>
+                    <td className="py-2 text-muted-foreground">{resultCountByUsername.get(u.username) ?? 0}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">

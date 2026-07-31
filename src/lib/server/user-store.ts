@@ -17,6 +17,8 @@ function redisKey(username: string): string {
   return `mbti64:user:${normalizeUsername(username)}`;
 }
 
+const USER_INDEX_KEY = "mbti64:users:index";
+
 // Same Redis-with-file-fallback pattern as the other stores.
 const DATA_DIR = path.join(process.cwd(), ".data");
 const FILE_PATH = path.join(DATA_DIR, "users.json");
@@ -65,12 +67,30 @@ export async function createUser(username: string, password: string): Promise<Cr
   const redis = getRedisClient();
   if (redis) {
     await redis.set(redisKey(normalized), account);
+    await redis.sadd(USER_INDEX_KEY, normalized);
   } else {
     const users = await readFileUsers();
     users[normalized] = account;
     await writeFileUsers(users);
   }
   return { ok: true, account };
+}
+
+/** All registered accounts, most recently created first — for the admin dashboard. */
+export async function getAllUsers(): Promise<UserAccount[]> {
+  const redis = getRedisClient();
+  let accounts: UserAccount[];
+  if (redis) {
+    const usernames = await redis.smembers(USER_INDEX_KEY);
+    if (usernames.length === 0) return [];
+    const keys = usernames.map((u) => redisKey(u));
+    const results = await redis.mget<(UserAccount | null)[]>(...keys);
+    accounts = results.filter((a): a is UserAccount => a !== null);
+  } else {
+    const users = await readFileUsers();
+    accounts = Object.values(users);
+  }
+  return accounts.sort((a, b) => b.createdAt - a.createdAt);
 }
 
 export async function verifyUserCredentials(username: string, password: string): Promise<UserAccount | null> {

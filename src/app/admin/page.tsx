@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { AdminDashboard } from "@/components/admin/admin-dashboard";
 import { ADMIN_COOKIE_NAME, isAdminConfigured, isValidAdminSessionToken } from "@/lib/server/admin-auth";
 import { getAllResults } from "@/lib/server/admin-log-store";
+import { getAllUsers } from "@/lib/server/user-store";
 import { getKvStatus } from "@/lib/server/kv-client";
 
 export const metadata: Metadata = {
@@ -35,13 +36,14 @@ export default async function AdminPage() {
     redirect("/admin/login");
   }
 
-  const results = await getAllResults();
+  const [results, accounts] = await Promise.all([getAllResults(), getAllUsers()]);
+  const users = accounts.map(({ username, createdAt }) => ({ username, createdAt }));
   const kvStatus = getKvStatus();
 
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
-      <AdminDashboard results={results} kvStatus={kvStatus} />
+      <AdminDashboard results={results} users={users} kvStatus={kvStatus} />
     </div>
   );
 }
