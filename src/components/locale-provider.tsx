@@ -23,6 +23,12 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 
+  // Keeps <html lang> in sync so :lang(my) CSS (Myanmar-specific letter-spacing/line-height
+  // fixes in globals.css) actually matches the rendered text.
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
+
   function setLocale(next: Locale) {
     setLocaleState(next);
     localStorage.setItem(LOCALE_STORAGE_KEY, next);

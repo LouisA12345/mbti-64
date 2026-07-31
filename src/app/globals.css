@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-geist-sans), var(--font-myanmar);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sora);
   --color-brand: var(--brand);
@@ -140,7 +140,7 @@
 
 @layer utilities {
   .font-heading {
-    font-family: var(--font-sora), var(--font-sans);
+    font-family: var(--font-sora), var(--font-myanmar), var(--font-sans);
   }
   .text-gradient-brand {
     background-image: linear-gradient(135deg, var(--brand), var(--brand-accent));
@@ -155,4 +155,16 @@
     background-image: radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0);
     background-size: 28px 28px;
   }
+}
+
+/*
+ * Deliberately outside any @layer: Tailwind's utility classes (tracking-tight, leading-tight,
+ * etc., tuned for Latin text) live in its "utilities" layer, and unlayered rules always beat
+ * layered ones regardless of source order or specificity. Myanmar script stacks medials/vowel
+ * signs above and below the base glyph, so negative letter-spacing and tight line-height —
+ * unnoticeable on Latin text — visibly crush and overlap Burmese characters.
+ */
+:lang(my) {
+  letter-spacing: normal;
+  line-height: 1.7;
 }
