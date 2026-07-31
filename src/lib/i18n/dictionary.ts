@@ -13,6 +13,7 @@ export const dictionary = {
   "nav.logIn": { en: "Log In", my: "လော့ဂ်အင်" },
   "nav.logOut": { en: "Log Out", my: "ထွက်ရန်" },
   "nav.signUp": { en: "Sign Up", my: "အကောင့်ဖွင့်ရန်" },
+  "nav.testNow": { en: "Test Now", my: "ယခုပင် စစ်ဆေးရန်" },
   "nav.toggleLanguage": { en: "Switch to Burmese", my: "အင်္ဂလိပ်သို့ ပြောင်းရန်" },
   "footer.credit": {
     en: "MBTI-64 is an original 64-type personality framework, built by Louis as a personal hobby project.",

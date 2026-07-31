@@ -1,5 +1,6 @@
 "use client";
 
+import { Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocale } from "@/components/locale-provider";
 import { useT } from "@/lib/i18n/use-translations";
@@ -16,7 +17,7 @@ export function LanguageToggle() {
       title={t("nav.toggleLanguage")}
       onClick={() => setLocale(locale === "en" ? "my" : "en")}
     >
-      <span className="text-xs font-semibold">{locale === "en" ? "MY" : "EN"}</span>
+      <Languages className="size-5" />
     </Button>
   );
 }

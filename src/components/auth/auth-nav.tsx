@@ -58,18 +58,13 @@ export function AuthNav({ variant = "desktop", onNavigate }: AuthNavProps) {
             </button>
           </>
         ) : (
-          <>
-            <Link href="/login" onClick={onNavigate} className={linkClass}>
-              {t("nav.logIn")}
-            </Link>
-            <Link
-              href="/signup"
-              onClick={onNavigate}
-              className="rounded-md bg-gradient-brand px-3 py-2.5 text-center text-sm font-medium text-white transition-opacity hover:opacity-90"
-            >
-              {t("nav.signUp")}
-            </Link>
-          </>
+          <Link
+            href="/quiz"
+            onClick={onNavigate}
+            className="rounded-md bg-gradient-brand px-3 py-2.5 text-center text-sm font-medium text-white transition-opacity hover:opacity-90"
+          >
+            {t("nav.testNow")}
+          </Link>
         )}
       </div>
     );
@@ -95,19 +90,11 @@ export function AuthNav({ variant = "desktop", onNavigate }: AuthNavProps) {
   }
 
   return (
-    <>
-      <Link
-        href="/login"
-        className="hidden rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:inline-block"
-      >
-        {t("nav.logIn")}
-      </Link>
-      <Link
-        href="/signup"
-        className="hidden rounded-md bg-gradient-brand px-3 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 sm:inline-block"
-      >
-        {t("nav.signUp")}
-      </Link>
-    </>
+    <Link
+      href="/quiz"
+      className="hidden rounded-md bg-gradient-brand px-3 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 sm:inline-block"
+    >
+      {t("nav.testNow")}
+    </Link>
   );
 }

@@ -39,9 +39,9 @@ export function SiteHeader() {
           >
             {t("nav.history")}
           </Link>
-          <AuthNav />
           <LanguageToggle />
           <ThemeToggle />
+          <AuthNav />
           <MobileNav />
         </nav>
       </div>
