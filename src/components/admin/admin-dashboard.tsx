@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut, ShieldCheck, Database, AlertTriangle, BadgeCheck, Search, Users } from "lucide-react";
+import { LogOut, ShieldCheck, Database, AlertTriangle, BadgeCheck, Search, Users, ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -38,14 +38,17 @@ interface AdminDashboardProps {
 export function AdminDashboard({ results, users, kvStatus }: AdminDashboardProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
+  const [expandedUsername, setExpandedUsername] = useState<string | null>(null);
 
-  const resultCountByUsername = useMemo(() => {
-    const counts = new Map<string, number>();
+  const resultsByUsername = useMemo(() => {
+    const map = new Map<string, GlobalResultEntry[]>();
     for (const r of results) {
       if (!r.verified) continue;
-      counts.set(r.name, (counts.get(r.name) ?? 0) + 1);
+      const list = map.get(r.name);
+      if (list) list.push(r);
+      else map.set(r.name, [r]);
     }
-    return counts;
+    return map;
   }, [results]);
 
   async function handleLogout() {
@@ -109,13 +112,61 @@ export function AdminDashboard({ results, users, kvStatus }: AdminDashboardProps
                 </tr>
               </thead>
               <tbody>
-                {users.map((u) => (
-                  <tr key={u.username} className="border-b border-border/40 last:border-0">
-                    <td className="py-2 pr-4 font-medium">{u.username}</td>
-                    <td className="py-2 pr-4 text-muted-foreground">{formatDate(u.createdAt)}</td>
-                    <td className="py-2 text-muted-foreground">{resultCountByUsername.get(u.username) ?? 0}</td>
-                  </tr>
-                ))}
+                {users.map((u) => {
+                  const userResults = resultsByUsername.get(u.username) ?? [];
+                  const isExpanded = expandedUsername === u.username;
+                  return (
+                    <Fragment key={u.username}>
+                      <tr
+                        onClick={() => userResults.length > 0 && setExpandedUsername(isExpanded ? null : u.username)}
+                        className={`border-b border-border/40 last:border-0 ${userResults.length > 0 ? "cursor-pointer hover:bg-muted/40" : ""}`}
+                      >
+                        <td className="py-2 pr-4 font-medium">
+                          <span className="flex items-center gap-1">
+                            {userResults.length > 0 &&
+                              (isExpanded ? (
+                                <ChevronDown className="size-3.5 text-muted-foreground" />
+                              ) : (
+                                <ChevronRight className="size-3.5 text-muted-foreground" />
+                              ))}
+                            {u.username}
+                          </span>
+                        </td>
+                        <td className="py-2 pr-4 text-muted-foreground">{formatDate(u.createdAt)}</td>
+                        <td className="py-2 text-muted-foreground">{userResults.length}</td>
+                      </tr>
+                      {isExpanded && userResults.length > 0 && (
+                        <tr className="border-b border-border/40 last:border-0">
+                          <td colSpan={3} className="bg-muted/20 py-3 pl-6 pr-2">
+                            <div className="flex flex-col gap-2">
+                              {userResults
+                                .slice()
+                                .sort((a, b) => b.completedAt - a.completedAt)
+                                .map((entry, i) => {
+                                  const profile = getProfile(entry.code as PersonalityCode);
+                                  const resultQuery = encodeScoresToQuery(entry.scores);
+                                  return (
+                                    <Link
+                                      key={`${entry.completedAt}-${i}`}
+                                      href={`/results/${profile.code}?${resultQuery.toString()}`}
+                                      className="flex items-center gap-3 rounded-lg border border-border/50 bg-card px-3 py-2 transition-colors hover:border-brand/50"
+                                    >
+                                      <PersonalityIllustration profile={profile} className="size-10 shrink-0 rounded-md" compact />
+                                      <Badge variant="outline" className="w-fit shrink-0 font-mono text-[10px]">
+                                        {profile.code}
+                                      </Badge>
+                                      <span className="min-w-0 flex-1 truncate text-sm font-medium">{profile.title}</span>
+                                      <span className="shrink-0 text-xs text-muted-foreground">{formatDate(entry.completedAt)}</span>
+                                    </Link>
+                                  );
+                                })}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  );
+                })}
               </tbody>
             </table>
           </div>
