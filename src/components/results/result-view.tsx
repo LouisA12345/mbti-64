@@ -10,6 +10,7 @@ import { DimensionBars } from "@/components/results/dimension-bars";
 import { RadarChartCard } from "@/components/results/radar-chart-card";
 import { ShareBar } from "@/components/results/share-bar";
 import { ProfileSections } from "@/components/results/profile-sections";
+import { PrintableResult } from "@/components/results/printable-result";
 import { SharedHistoryPrompt } from "@/components/results/shared-history-prompt";
 import { useT } from "@/lib/i18n/use-translations";
 import { useLocale } from "@/components/locale-provider";
@@ -45,7 +46,7 @@ export function ResultView({ code, scores, isPersonal, forOwnerId }: ResultViewP
         </div>
       )}
 
-      <div id="result-capture" className="grid gap-8 rounded-3xl border border-border/60 bg-card/40 p-6 sm:p-8 md:grid-cols-[minmax(0,320px)_1fr]">
+      <div className="grid gap-8 rounded-3xl border border-border/60 bg-card/40 p-6 sm:p-8 md:grid-cols-[minmax(0,320px)_1fr]">
         <PersonalityIllustration profile={profile} />
         <div className="flex flex-col justify-center gap-4">
           <div className="flex flex-wrap items-center gap-2">
@@ -72,7 +73,8 @@ export function ResultView({ code, scores, isPersonal, forOwnerId }: ResultViewP
         </div>
       </div>
 
-      <ShareBar profile={profile} captureElementId="result-capture" />
+      <ShareBar profile={profile} captureElementId="result-print" />
+      <PrintableResult id="result-print" profile={profile} scores={scores} />
 
       <Card>
         <CardHeader>
