@@ -11,7 +11,13 @@ export const ADMIN_SESSION_TTL_SECONDS = 60 * 60 * 12; // 12 hours
 
 // Not a real user account — just a fixed marker stored as the "username" for admin sessions,
 // reusing the same random-token, revocable session store as regular accounts.
-const ADMIN_SESSION_MARKER = "__admin__";
+//
+// Bumping this string instantly invalidates every admin session that currently exists, anywhere
+// — including ones issued before a TTL change, which a shorter TTL alone can't touch since a
+// session's expiry is fixed in Redis at the moment it's created. Old tokens still resolve to the
+// old marker value below, but that no longer equals the new one, so isValidAdminSessionToken
+// rejects them. Bump the suffix any time you want to force every admin session to re-login.
+const ADMIN_SESSION_MARKER = "__admin_v2__";
 
 export function isAdminConfigured(): boolean {
   return Boolean(process.env.ADMIN_PASSWORD);
