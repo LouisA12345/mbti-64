@@ -4,10 +4,12 @@ import { createSession, deleteSession, getSessionUsername } from "./session-stor
 
 export const ADMIN_COOKIE_NAME = "mbti64_admin_session";
 
-// Admin sessions are deliberately much shorter-lived than regular user sessions (which persist
-// for 30 days) — this is a higher-privilege account, so a stolen/leftover cookie should stop
-// working well before a month goes by.
-export const ADMIN_SESSION_TTL_SECONDS = 60 * 60 * 12; // 12 hours
+// Admin sessions are deliberately short-lived, unlike regular user sessions (30 days) — this is
+// a higher-privilege account, so it shouldn't stay trusted for long. The cookie itself is also
+// set with no maxAge (see the login route), so it's gone as soon as the browser closes; this TTL
+// is the server-side backstop that still applies even if a browser's "reopen previous tabs" /
+// session-restore feature resurrects a closed-but-not-actually-gone session cookie.
+export const ADMIN_SESSION_TTL_SECONDS = 60 * 30; // 30 minutes
 
 // Not a real user account — just a fixed marker stored as the "username" for admin sessions,
 // reusing the same random-token, revocable session store as regular accounts.

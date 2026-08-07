@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ADMIN_COOKIE_NAME, ADMIN_SESSION_TTL_SECONDS, createAdminSession, verifyAdminPassword } from "@/lib/server/admin-auth";
+import { ADMIN_COOKIE_NAME, createAdminSession, verifyAdminPassword } from "@/lib/server/admin-auth";
 import { consumeRateLimit, getClientIp } from "@/lib/server/rate-limit";
 
 export async function POST(request: Request) {
@@ -25,7 +25,8 @@ export async function POST(request: Request) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: ADMIN_SESSION_TTL_SECONDS,
+    // Deliberately no maxAge/expires: a browser-session cookie, gone as soon as the browser
+    // itself closes, instead of surviving on disk like a "remember me" login would.
   });
   return res;
 }
