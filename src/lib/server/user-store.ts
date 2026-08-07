@@ -123,3 +123,40 @@ export async function verifyUserCredentials(username: string, password: string):
   if (!account) return null;
   return verifyPassword(password, account.passwordHash) ? account : null;
 }
+
+/** Admin-only: permanently removes an account. Returns false if no such account exists. */
+export async function deleteUser(username: string): Promise<boolean> {
+  const normalized = normalizeUsername(username);
+  const existing = await getUser(normalized);
+  if (!existing) return false;
+
+  const redis = getRedisClient();
+  if (redis) {
+    await redis.del(redisKey(normalized));
+  } else {
+    const users = await readFileUsers();
+    delete users[normalized];
+    await writeFileUsers(users);
+  }
+  return true;
+}
+
+/** Admin-only: sets a new password for an existing account (e.g. a forced reset). Returns false
+ * if no such account exists. Never reads or exposes the account's existing password — hashes are
+ * one-way, so there is no "original password" to view in the first place. */
+export async function setUserPassword(username: string, newPassword: string): Promise<boolean> {
+  const normalized = normalizeUsername(username);
+  const existing = await getUser(normalized);
+  if (!existing) return false;
+
+  const updated: UserAccount = { ...existing, passwordHash: hashPassword(newPassword) };
+  const redis = getRedisClient();
+  if (redis) {
+    await redis.set(redisKey(normalized), updated);
+  } else {
+    const users = await readFileUsers();
+    users[normalized] = updated;
+    await writeFileUsers(users);
+  }
+  return true;
+}

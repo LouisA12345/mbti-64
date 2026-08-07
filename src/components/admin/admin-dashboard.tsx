@@ -3,11 +3,17 @@
 import { Fragment, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut, ShieldCheck, Database, AlertTriangle, BadgeCheck, Search, Users, ChevronDown, ChevronRight } from "lucide-react";
+import {
+  LogOut, ShieldCheck, Database, AlertTriangle, BadgeCheck, Search, Users, ChevronDown, ChevronRight,
+  KeyRound, Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { PersonalityIllustration } from "@/components/results/personality-illustration";
+import { AddUserDialog } from "@/components/admin/add-user-dialog";
+import { ResetPasswordDialog } from "@/components/admin/reset-password-dialog";
+import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { getProfile } from "@/lib/data/profiles";
 import { encodeScoresToQuery } from "@/lib/scoring";
 import type { PersonalityCode } from "@/lib/types";
@@ -39,6 +45,27 @@ export function AdminDashboard({ results, users, kvStatus }: AdminDashboardProps
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [expandedUsername, setExpandedUsername] = useState<string | null>(null);
+  const [resetPasswordUsername, setResetPasswordUsername] = useState<string | null>(null);
+  const [deleteUsername, setDeleteUsername] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  async function handleDeleteConfirm() {
+    if (!deleteUsername) return;
+    setDeleteLoading(true);
+    try {
+      const res = await fetch("/api/admin/users/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: deleteUsername }),
+      });
+      if (res.ok) {
+        setDeleteUsername(null);
+        router.refresh();
+      }
+    } finally {
+      setDeleteLoading(false);
+    }
+  }
 
   const resultsByUsername = useMemo(() => {
     const map = new Map<string, GlobalResultEntry[]>();
@@ -95,10 +122,13 @@ export function AdminDashboard({ results, users, kvStatus }: AdminDashboardProps
       )}
 
       <div className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-card p-4">
-        <p className="flex items-center gap-2 text-sm font-medium">
-          <Users className="size-4 text-brand" />
-          Registered Accounts ({users.length})
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="flex items-center gap-2 text-sm font-medium">
+            <Users className="size-4 text-brand" />
+            Registered Accounts ({users.length})
+          </p>
+          <AddUserDialog onCreated={() => router.refresh()} />
+        </div>
         {users.length === 0 ? (
           <p className="text-sm text-muted-foreground">No accounts have signed up yet.</p>
         ) : (
@@ -108,7 +138,8 @@ export function AdminDashboard({ results, users, kvStatus }: AdminDashboardProps
                 <tr className="border-b border-border/60 text-left text-xs text-muted-foreground">
                   <th className="pb-2 pr-4 font-medium">Username</th>
                   <th className="pb-2 pr-4 font-medium">Signed Up</th>
-                  <th className="pb-2 font-medium">Results</th>
+                  <th className="pb-2 pr-4 font-medium">Results</th>
+                  <th className="pb-2 font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -133,11 +164,40 @@ export function AdminDashboard({ results, users, kvStatus }: AdminDashboardProps
                           </span>
                         </td>
                         <td className="py-2 pr-4 text-muted-foreground">{formatDate(u.createdAt)}</td>
-                        <td className="py-2 text-muted-foreground">{userResults.length}</td>
+                        <td className="py-2 pr-4 text-muted-foreground">{userResults.length}</td>
+                        <td className="py-2">
+                          <div className="flex items-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              title="Reset password"
+                              aria-label={`Reset password for ${u.username}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setResetPasswordUsername(u.username);
+                              }}
+                            >
+                              <KeyRound className="size-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              title="Delete account"
+                              aria-label={`Delete ${u.username}`}
+                              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteUsername(u.username);
+                              }}
+                            >
+                              <Trash2 className="size-3.5" />
+                            </Button>
+                          </div>
+                        </td>
                       </tr>
                       {isExpanded && userResults.length > 0 && (
                         <tr className="border-b border-border/40 last:border-0">
-                          <td colSpan={3} className="bg-muted/20 py-3 pl-6 pr-2">
+                          <td colSpan={4} className="bg-muted/20 py-3 pl-6 pr-2">
                             <div className="flex flex-col gap-2">
                               {userResults
                                 .slice()
@@ -229,6 +289,22 @@ export function AdminDashboard({ results, users, kvStatus }: AdminDashboardProps
           })}
         </div>
       )}
+
+      <ResetPasswordDialog
+        username={resetPasswordUsername}
+        onOpenChange={(open) => !open && setResetPasswordUsername(null)}
+        onSuccess={() => router.refresh()}
+      />
+      <ConfirmDialog
+        open={deleteUsername !== null}
+        onOpenChange={(open) => !open && setDeleteUsername(null)}
+        title={`Delete ${deleteUsername}?`}
+        description="This permanently deletes their account and all results saved to it. This can't be undone."
+        confirmLabel="Delete Account"
+        destructive
+        loading={deleteLoading}
+        onConfirm={handleDeleteConfirm}
+      />
     </main>
   );
 }

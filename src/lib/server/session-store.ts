@@ -3,7 +3,7 @@ import path from "path";
 import crypto from "crypto";
 import { getRedisClient } from "./kv-client";
 
-const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30; // 30 days
+export const DEFAULT_SESSION_TTL_SECONDS = 60 * 60 * 24 * 30; // 30 days
 
 interface SessionRecord {
   username: string;
@@ -35,14 +35,14 @@ async function writeFileSessions(sessions: SessionsShape): Promise<void> {
   await fs.writeFile(FILE_PATH, JSON.stringify(sessions), "utf-8");
 }
 
-export async function createSession(username: string): Promise<string> {
+export async function createSession(username: string, ttlSeconds: number = DEFAULT_SESSION_TTL_SECONDS): Promise<string> {
   const token = crypto.randomBytes(32).toString("hex");
   const redis = getRedisClient();
   if (redis) {
-    await redis.set(redisKey(token), username, { ex: SESSION_TTL_SECONDS });
+    await redis.set(redisKey(token), username, { ex: ttlSeconds });
   } else {
     const sessions = await readFileSessions();
-    sessions[token] = { username, expiresAt: Date.now() + SESSION_TTL_SECONDS * 1000 };
+    sessions[token] = { username, expiresAt: Date.now() + ttlSeconds * 1000 };
     await writeFileSessions(sessions);
   }
   return token;
